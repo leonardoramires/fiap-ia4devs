@@ -418,64 +418,123 @@ def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
         operators (dict): Dicionário com informações dos operadores
         orders (dict): Dicionário com informações das ordens
     """
-    print("\n" + "="*50)
-    print("RESULTADO DA OTIMIZAÇÃO".center(50))
-    print("="*50)
+    print("\n" + "="*80)
+    print("RELATÓRIO DETALHADO DE ALOCAÇÃO".center(80))
+    print("="*80)
 
-    # Estatísticas gerais
+    # 1. Estatísticas Gerais
     total_ordens = len(orders)
     ordens_alocadas = len(df['id_ordem'].unique())
     ordens_nao_alocadas = len(unassigned_orders)
 
-    print(f"\nEstatísticas Gerais:")
+    print("\n1. ESTATÍSTICAS GERAIS")
+    print("-"*40)
     print(f"Total de Ordens: {total_ordens}")
     print(f"Ordens Alocadas: {ordens_alocadas} ({(ordens_alocadas/total_ordens)*100:.1f}%)")
     print(f"Ordens Não Alocadas: {ordens_nao_alocadas}")
 
-    # Análise de compatibilidade de habilidades
-    matches_perfeitos = 0
-    total_alocacoes = len(df)
+    # 2. Análise por Prioridade
+    print("\n2. ANÁLISE POR PRIORIDADE")
+    print("-"*40)
+    for prioridade in ['urgente', 'alta', 'média', 'baixa']:
+        count = len(df[df['prioridade'] == prioridade])
+        if count > 0:
+            print(f"Prioridade {prioridade:8s}: {count:3d} ordens ({(count/ordens_alocadas)*100:5.1f}%)")
+
+    # 3. Análise por Operador
+    print("\n3. ANÁLISE POR OPERADOR")
+    print("-"*40)
+    for operador in df['id_operador'].unique():
+        df_op = df[df['id_operador'] == operador]
+        horas_total = df_op['horas_estimadas'].sum()
+        horas_disp = df_op['horas_disponiveis'].iloc[0]
+        n_ordens = len(df_op)
+        print(f"Operador {operador}:")
+        print(f"  - Ordens alocadas: {n_ordens}")
+        print(f"  - Horas alocadas: {horas_total:.1f}h de {horas_disp:.1f}h ({(horas_total/horas_disp)*100:.1f}%)")
+
+    # 4. Análise de Prazos
+    print("\n4. ANÁLISE DE PRAZOS")
+    print("-"*40)
+    df['atraso'] = df['dia'] - df['prazo']
+    ordens_no_prazo = len(df[df['atraso'] <= 0])
+    print(f"Ordens no Prazo: {ordens_no_prazo} ({(ordens_no_prazo/ordens_alocadas)*100:.1f}%)")
     
-    print(f"\nAlocações por Dia:")
-    print("-" * 130)
+    if len(df[df['atraso'] > 0]) > 0:
+        print("\nDetalhamento dos Atrasos:")
+        for _, row in df[df['atraso'] > 0].iterrows():
+            print(f"  Ordem {row['id_ordem']}: {row['atraso']} dias de atraso (Prioridade: {row['prioridade']})")
+
+    # 5. Análise de Habilidades
+    print("\n5. ANÁLISE DE COMPATIBILIDADE")
+    print("-"*40)
     
-    # Agrupa por dia para mostrar alocações
+    def verificar_compatibilidade(row):
+        req_skills = set(row['habilidades_ordem'].split(" | "))
+        op_skills = set(row['habilidades_operador'].split(" | "))
+        return len(req_skills.intersection(op_skills)) / len(req_skills)
+
+    df['compatibilidade'] = df.apply(verificar_compatibilidade, axis=1)
+    matches_perfeitos = len(df[df['compatibilidade'] == 1])
+    
+    print(f"Matches Perfeitos: {matches_perfeitos} ({(matches_perfeitos/ordens_alocadas)*100:.1f}%)")
+    print(f"Compatibilidade Média: {df['compatibilidade'].mean()*100:.1f}%")
+
+    # 6. Análise por Dia
+    print("\n6. DISTRIBUIÇÃO POR DIA")
+    print("-"*40)
     for dia in sorted(df['dia'].unique()):
-        alocacoes_dia = df[df['dia'] == dia]
+        df_dia = df[df['dia'] == dia]
         print(f"\nDia {dia}:")
-        
-        for _, row in alocacoes_dia.iterrows():
-            # Verifica se todas as habilidades necessárias estão presentes
-            required_skills = set(row['habilidades_ordem'].split(" | "))
-            operator_skills = set(row['habilidades_operador'].split(" | "))
-            match_perfeito = required_skills.issubset(operator_skills)
-            
-            if match_perfeito:
-                matches_perfeitos += 1
-            
-            status = "✓" if match_perfeito else "✗"
-            
-            print(f"{status} Ordem {row['id_ordem']:4} "
-                  f"(Skills: {row['habilidades_ordem']:20s}, "
-                  f"Horas: {row['horas_estimadas']:2d}, "
-                  f"Prazo: {row['prazo']:2d}) → "
-                  f"Operador {row['id_operador']:3} "
-                  f"(Skills: {row['habilidades_operador']:20s}, "
-                  f"Nível: {row['nivel_operador']:8s}, "
-                  f"Horas Disp: {row['horas_disponiveis']})")
+        print(f"  - Total de Ordens: {len(df_dia)}")
+        print(f"  - Horas Alocadas: {df_dia['horas_estimadas'].sum():.1f}h")
+        print(f"  - Distribuição de Prioridades:")
+        for prioridade in ['urgente', 'alta', 'média', 'baixa']:
+            count = len(df_dia[df_dia['prioridade'] == prioridade])
+            if count > 0:
+                print(f"    * {prioridade:8s}: {count:3d}")
 
-    print("\n" + "-" * 130)
-    print(f"Taxa de Compatibilidade: {(matches_perfeitos/total_alocacoes)*100:.1f}%")
-    print(f"Matches Perfeitos: {matches_perfeitos}/{total_alocacoes}")
-
+    # 7. Ordens Não Alocadas
     if unassigned_orders:
-        print("\nOrdens Não Alocadas:")
+        print("\n7. ORDENS NÃO ALOCADAS")
+        print("-"*40)
+        print(f"Total de ordens não alocadas: {len(unassigned_orders)}")
+        
+        # Agrupa por prioridade
+        unassigned_by_priority = {}
         for order_id in unassigned_orders:
-            order = orders[order_id]
-            print(f"- {order_id}: Skills={order['required_skills']}, "
-                  f"Horas={order['estimated_hours']}, "
-                  f"Prioridade={order['priority']}, "
-                  f"Prazo={order['deadline_days']}")
+            priority = orders[order_id]['priority']
+            if priority not in unassigned_by_priority:
+                unassigned_by_priority[priority] = []
+            unassigned_by_priority[priority].append(order_id)
+        
+        for priority in ['urgente', 'alta', 'média', 'baixa']:
+            if priority in unassigned_by_priority:
+                orders_list = unassigned_by_priority[priority]
+                print(f"\nPrioridade {priority}: {len(orders_list)} ordens")
+                for order_id in orders_list:
+                    order = orders[order_id]
+                    print(f"  - {order_id}: "
+                          f"Skills={', '.join(order['required_skills'])}, "
+                          f"Horas={order['estimated_hours']}, "
+                          f"Prazo={order['deadline_days']}")
+
+    print("\n" + "="*80)
+    print("FIM DO RELATÓRIO".center(80))
+    print("="*80)
+
+    # Retorna métricas principais para uso no algoritmo genético
+    return {
+        'total_ordens': total_ordens,
+        'ordens_alocadas': ordens_alocadas,
+        'ordens_nao_alocadas': ordens_nao_alocadas,
+        'taxa_alocacao': (ordens_alocadas/total_ordens)*100,
+        'matches_perfeitos': matches_perfeitos,
+        'taxa_matches_perfeitos': (matches_perfeitos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'compatibilidade_media': df['compatibilidade'].mean()*100 if not df.empty else 0,
+        'ordens_no_prazo': ordens_no_prazo,
+        'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
+    }
 
 # Função para executar o algoritmo genético
 def run_genetic_algorithm(operators, orders, population_size=50, generations=100, mutation_rate=0.4, elitism_size=5, reinitalize_interval=10):
