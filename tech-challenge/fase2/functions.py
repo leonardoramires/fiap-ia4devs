@@ -408,6 +408,74 @@ def solution_to_dataframe(solution, operators, orders):
     unassigned_orders = list(set(orders.keys() - set(df["id_ordem"].unique())))
     return df, unassigned_orders
 
+def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
+    """
+    Imprime um relatório detalhado da alocação de ordens de serviço.
+    
+    Args:
+        df (pd.DataFrame): DataFrame com a solução de alocação
+        unassigned_orders (list): Lista de ordens não alocadas
+        operators (dict): Dicionário com informações dos operadores
+        orders (dict): Dicionário com informações das ordens
+    """
+    print("\n" + "="*50)
+    print("RESULTADO DA OTIMIZAÇÃO".center(50))
+    print("="*50)
+
+    # Estatísticas gerais
+    total_ordens = len(orders)
+    ordens_alocadas = len(df['id_ordem'].unique())
+    ordens_nao_alocadas = len(unassigned_orders)
+
+    print(f"\nEstatísticas Gerais:")
+    print(f"Total de Ordens: {total_ordens}")
+    print(f"Ordens Alocadas: {ordens_alocadas} ({(ordens_alocadas/total_ordens)*100:.1f}%)")
+    print(f"Ordens Não Alocadas: {ordens_nao_alocadas}")
+
+    # Análise de compatibilidade de habilidades
+    matches_perfeitos = 0
+    total_alocacoes = len(df)
+    
+    print(f"\nAlocações por Dia:")
+    print("-" * 130)
+    
+    # Agrupa por dia para mostrar alocações
+    for dia in sorted(df['dia'].unique()):
+        alocacoes_dia = df[df['dia'] == dia]
+        print(f"\nDia {dia}:")
+        
+        for _, row in alocacoes_dia.iterrows():
+            # Verifica se todas as habilidades necessárias estão presentes
+            required_skills = set(row['habilidades_ordem'].split(" | "))
+            operator_skills = set(row['habilidades_operador'].split(" | "))
+            match_perfeito = required_skills.issubset(operator_skills)
+            
+            if match_perfeito:
+                matches_perfeitos += 1
+            
+            status = "✓" if match_perfeito else "✗"
+            
+            print(f"{status} Ordem {row['id_ordem']:4} "
+                  f"(Skills: {row['habilidades_ordem']:20s}, "
+                  f"Horas: {row['horas_estimadas']:2d}, "
+                  f"Prazo: {row['prazo']:2d}) → "
+                  f"Operador {row['id_operador']:3} "
+                  f"(Skills: {row['habilidades_operador']:20s}, "
+                  f"Nível: {row['nivel_operador']:8s}, "
+                  f"Horas Disp: {row['horas_disponiveis']})")
+
+    print("\n" + "-" * 130)
+    print(f"Taxa de Compatibilidade: {(matches_perfeitos/total_alocacoes)*100:.1f}%")
+    print(f"Matches Perfeitos: {matches_perfeitos}/{total_alocacoes}")
+
+    if unassigned_orders:
+        print("\nOrdens Não Alocadas:")
+        for order_id in unassigned_orders:
+            order = orders[order_id]
+            print(f"- {order_id}: Skills={order['required_skills']}, "
+                  f"Horas={order['estimated_hours']}, "
+                  f"Prioridade={order['priority']}, "
+                  f"Prazo={order['deadline_days']}")
 
 # Função para executar o algoritmo genético
 def run_genetic_algorithm(operators, orders, population_size=50, generations=100, mutation_rate=0.4, elitism_size=5, reinitalize_interval=10):
@@ -474,6 +542,8 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
     best_solution = max(population, key=lambda sol: calculate_fitness(sol, operators, orders))
     print(f"\nBest solution fitness: {calculate_fitness(best_solution, operators, orders):.2f}")
 
-    # Converte a melhor solução para DataFrame
-    df = solution_to_dataframe(best_solution, operators, orders)
-    return df
+    # Converte a melhor solução para DataFrame e imprime os resultados
+    df, unassigned_orders = solution_to_dataframe(best_solution, operators, orders)
+    imprimir_resultados_alocacao(df, unassigned_orders, operators, orders)
+    
+    return df, unassigned_orders
