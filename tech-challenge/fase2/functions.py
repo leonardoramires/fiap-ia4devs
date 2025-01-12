@@ -1,6 +1,7 @@
 import random
 import pandas as pd
 import time
+import dynamic_fitness_view as View
 
 # Função para criar os dados de exemplo
 def create_sample_data(n_orders=None, n_operators=None):
@@ -431,6 +432,9 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
     - Em cada geração, os melhores pais são selecionados para realizar o crossover e gerar novos filhos.
     - O algoritmo utiliza a mutação, elitismo e re-inicialização periódica da população.
     """
+    # Preparação para exibição dinâmica da aptidão
+    view = View.DynamicFitnessView()
+
     # Criação da população inicial
     population = [create_initial_solution(operators, orders) for _ in range(population_size)]
 
@@ -441,6 +445,7 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
         # Exibição da aptidão da melhor solução da geração
         best_fitness = max(fitness_scores)
         print(f"\nGeneration {generation + 1}/{generations} - Best Fitness: {best_fitness:.2f} - Mutation Rate: {mutation_rate:.4f}")
+        view.add_fitness(best_fitness)
         time.sleep(0.1)  # Delay para animação
 
         # Seleção dos pais
@@ -469,6 +474,8 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
             new_population[-num_to_reinitialize:] = [create_initial_solution(operators, orders) for _ in range(num_to_reinitialize)]
 
         population = new_population
+
+    view.show()
 
     # Após as gerações, mostra a melhor solução
     best_solution = max(population, key=lambda sol: calculate_fitness(sol, operators, orders))
