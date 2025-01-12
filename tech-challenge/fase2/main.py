@@ -69,15 +69,15 @@ def main():
     _N_ORDERS = 100
     _N_OPERATORS = 15
 
-    algorithms = ['linear', 'greedy', 'genetic'] if args.algorithm is None else [args.algorithm]
+    algorithms = ['genetic', 'greedy', 'linear'] if args.algorithm is None else [args.algorithm]
 
     for algorithm in algorithms:
-        if algorithm == 'linear':
+        if algorithm == 'genetic':
+            run_genetic_algorithm(_N_ORDERS, _N_OPERATORS)
+        elif algorithm == 'linear':
             run_linear_algorithm(_N_ORDERS, _N_OPERATORS)
         elif algorithm == 'greedy':
             run_greedy_algorithm(_N_ORDERS, _N_OPERATORS)
-        elif algorithm == 'genetic':
-            run_genetic_algorithm(_N_ORDERS, _N_OPERATORS)
 
 if __name__ == "__main__":
     main()

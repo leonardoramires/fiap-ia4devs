@@ -39,8 +39,8 @@ def linear_programming_allocation(operators, orders, days=5):
         for op in operators:
             prob += pulp.lpSum(orders[order]["estimated_hours"] * x[day, op, order] for order in orders) <= operators[op]["hours_per_day"]
 
-    # Resolve o problema
-    prob.solve()
+    # Resolve o problema sem exibir mensagens no terminal
+    prob.solve(pulp.PULP_CBC_CMD(msg=False))
 
     # Cria a solução a partir das variáveis de decisão
     solution = {day: {op: [] for op in operators} for day in range(days)}
