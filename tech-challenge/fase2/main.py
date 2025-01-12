@@ -45,4 +45,5 @@ if __name__ == '__main__':
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
     
     final_df.to_csv("resultado.csv", index=False)
+    final_df.to_excel("resultado.xlsx", index=False)
         
