@@ -1,6 +1,6 @@
 import random
-import time
 import pandas as pd
+import time
 
 # Função para criar os dados de exemplo
 def create_sample_data(n_orders=None, n_operators=None):
@@ -16,10 +16,10 @@ def create_sample_data(n_orders=None, n_operators=None):
 
     Detalhes:
     - Se 'n_operators' for fornecido, serão gerados operadores aleatórios com habilidades e horários.
-    - As ordens de serviço são geradas com habilidades, horas estimadas, prioridade e inicio_esperado de forma aleatória.
+    - As ordens de serviço são geradas com habilidades, horas estimadas, prioridade e prazo de forma aleatória.
     """
     skills = ["pintura", "elétrica", "alvenaria", "hidráulica", "solda"]
-    skill_levels = ["júnior", "pleno", "sênior", "especialista"]
+    skill_levels = ["júnior", "pleno", "sênior"]
     priority_levels = ["baixa", "média", "alta", "urgente"]
 
     # Geração automática de operadores, se n_operators for fornecido
@@ -28,43 +28,43 @@ def create_sample_data(n_orders=None, n_operators=None):
         for i in range(1, n_operators + 1):
             op_id = f"op{i}"
             num_skills = random.randint(2, 3)
-            op_skills = random.sample(skills, num_skills)
-            level = random.choice(skill_levels)
+            op_skills = {random.choice(skills): random.choice(skill_levels) for _ in range(num_skills)}
             shift = random.choice(["manhã", "tarde", "noite"])
             hours_per_day = random.randint(7, 9)
-            operators[op_id] = {"skills": op_skills, "level": level, "shift": shift, "hours_per_day": hours_per_day}
+            operators[op_id] = {"skills": op_skills, "shift": shift, "hours_per_day": hours_per_day}
     else:
         # Dados dos operadores predefinidos
         operators = {
-            "op1": {"skills": ["pintura", "elétrica"], "level": "sênior", "shift": "manhã", "hours_per_day": 8},
-            "op2": {"skills": ["hidráulica", "alvenaria"], "level": "pleno", "shift": "tarde", "hours_per_day": 8},
-            "op3": {"skills": ["solda", "pintura"], "level": "sênior", "shift": "noite", "hours_per_day": 9},
-            "op4": {"skills": ["elétrica", "hidráulica"], "level": "júnior", "shift": "manhã", "hours_per_day": 7},
+            "op1": {"skills": {"pintura": "sênior", "elétrica": "pleno"}, "shift": "manhã", "hours_per_day": 8},
+            "op2": {"skills": {"hidráulica": "pleno", "alvenaria": "sênior"}, "shift": "tarde", "hours_per_day": 8},
+            "op3": {"skills": {"solda": "sênior", "pintura": "pleno"}, "shift": "noite", "hours_per_day": 9},
+            "op4": {"skills": {"elétrica": "júnior", "hidráulica": "sênior"}, "shift": "manhã", "hours_per_day": 7},
         }
 
     # Geração dinâmica de ordens de serviço
+    
     if n_orders:
         service_orders = {}
         for i in range(n_orders):
-            required_skills = random.sample(skills, random.randint(1, 2))
+            required_skills = {random.choice(skills): random.choice(skill_levels) for _ in range(random.randint(1, 2))}
             service_orders[f"ordem{i+1}"] = {
                 "required_skills": required_skills,
                 "estimated_hours": random.randint(2, 8),
                 "priority": random.choice(priority_levels),
-                "expected_start_day": random.randint(1, 5),
+                "deadline_days": random.randint(1, 5),
             }
     else:
         service_orders = {
-            'ordem1': {'required_skills': ['solda', 'alvenaria'], 'estimated_hours': 2, 'priority': 'média', 'expected_start_day': 3},
-            'ordem2': {'required_skills': ['pintura', 'hidráulica'], 'estimated_hours': 8, 'priority': 'alta', 'expected_start_day': 2},
-            'ordem3': {'required_skills': ['hidráulica'], 'estimated_hours': 5, 'priority': 'urgente', 'expected_start_day': 5},
-            'ordem4': {'required_skills': ['hidráulica', 'pintura'], 'estimated_hours': 2, 'priority': 'urgente', 'expected_start_day': 1},
-            'ordem5': {'required_skills': ['alvenaria'], 'estimated_hours': 5, 'priority': 'alta', 'expected_start_day': 3},
-            'ordem6': {'required_skills': ['alvenaria'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 5},
-            'ordem7': {'required_skills': ['elétrica'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 4},
-            'ordem8': {'required_skills': ['solda'], 'estimated_hours': 8, 'priority': 'baixa', 'expected_start_day': 5},
-            'ordem9': {'required_skills': ['pintura'], 'estimated_hours': 3, 'priority': 'baixa', 'expected_start_day': 4},
-            'ordem10': {'required_skills': ['alvenaria', 'solda'], 'estimated_hours': 2, 'priority': 'alta', 'expected_start_day': 5}
+            'ordem1': {'required_skills': {'solda': 'sênior', 'alvenaria': 'pleno'}, 'estimated_hours': 2, 'priority': 'média', 'deadline_days': 3},
+            'ordem2': {'required_skills': {'pintura': 'sênior', 'hidráulica': 'especialista'}, 'estimated_hours': 8, 'priority': 'alta', 'deadline_days': 2},
+            'ordem3': {'required_skills': {'hidráulica': 'especialista'}, 'estimated_hours': 5, 'priority': 'urgente', 'deadline_days': 5},
+            'ordem4': {'required_skills': {'hidráulica': 'júnior', 'pintura': 'pleno'}, 'estimated_hours': 2, 'priority': 'urgente', 'deadline_days': 1},
+            'ordem5': {'required_skills': {'alvenaria': 'sênior'}, 'estimated_hours': 5, 'priority': 'alta', 'deadline_days': 3},
+            'ordem6': {'required_skills': {'alvenaria': 'especialista'}, 'estimated_hours': 7, 'priority': 'baixa', 'deadline_days': 5},
+            'ordem7': {'required_skills': {'elétrica': 'sênior'}, 'estimated_hours': 7, 'priority': 'baixa', 'deadline_days': 4},
+            'ordem8': {'required_skills': {'solda': 'júnior'}, 'estimated_hours': 8, 'priority': 'baixa', 'deadline_days': 5},
+            'ordem9': {'required_skills': {'pintura': 'pleno'}, 'estimated_hours': 3, 'priority': 'baixa', 'deadline_days': 4},
+            'ordem10': {'required_skills': {'alvenaria': 'sênior', 'solda': 'especialista'}, 'estimated_hours': 2, 'priority': 'alta', 'deadline_days': 5}
         }
 
     return operators, service_orders
@@ -76,7 +76,7 @@ def sample_to_dataframe(operators, service_orders):
 
     Args:
         operators (dict): Dicionário com dados dos operadores, incluindo suas habilidades, turnos e horas de trabalho.
-        service_orders (dict): Dicionário com ordens de serviço, incluindo habilidades exigidas, horas estimadas, prioridade e inicio_esperado.
+        service_orders (dict): Dicionário com ordens de serviço, incluindo habilidades exigidas, horas estimadas, prioridade e prazo.
 
     Returns:
         tuple: Um tuple contendo dois DataFrames:
@@ -84,33 +84,36 @@ def sample_to_dataframe(operators, service_orders):
             - service_orders_df: DataFrame com os dados das ordens de serviço.
 
     Detalhes:
-    - O DataFrame dos operadores inclui as colunas: 'operator_id', 'skills', 'level', 'shift', 'hours_per_day'.
-    - O DataFrame das ordens de serviço inclui as colunas: 'order_id', 'required_skills', 'estimated_hours', 'priority', 'expected_start_day'.
+    - O DataFrame dos operadores inclui as colunas: 'operator_id', 'skill', 'level', 'shift', 'hours_per_day'.
+    - O DataFrame das ordens de serviço inclui as colunas: 'order_id', 'required_skill', 'required_skill_level', 'estimated_hours', 'priority', 'deadline_days'.
     """
 
     # Converte os operadores em um DataFrame
     operators_data = []
     for operator_id, details in operators.items():
-        operators_data.append({
-            "operator_id": operator_id,
-            "skills": " | ".join(details["skills"]),
-            "level": details["level"],
-            "shift": details["shift"],
-            "hours_per_day": details["hours_per_day"]
-        })
+        for skill, level in details["skills"].items():
+            operators_data.append({
+                "operator_id": operator_id,
+                "skill": skill,
+                "level": level,
+                "shift": details["shift"],
+                "hours_per_day": details["hours_per_day"]
+            })
 
     operators_df = pd.DataFrame(operators_data)
 
     # Converte as ordens de serviço em um DataFrame
     service_orders_data = []
     for order_id, details in service_orders.items():
-        service_orders_data.append({
-            "order_id": order_id,
-            "required_skills": " | ".join(details["required_skills"]),
-            "estimated_hours": details["estimated_hours"],
-            "priority": details["priority"],
-            "expected_start_day": details["expected_start_day"]
-        })
+        for skill, level in details["required_skills"].items():
+            service_orders_data.append({
+                "order_id": order_id,
+                "required_skill": skill,
+                "required_skill_level": level,
+                "estimated_hours": details["estimated_hours"],
+                "priority": details["priority"],
+                "deadline_days": details["deadline_days"]
+            })
 
     service_orders_df = pd.DataFrame(service_orders_data)
 
@@ -144,19 +147,22 @@ def priority_to_number(priority):
     priorities = {"baixa": 1, "média": 2, "alta": 3, "urgente": 4}
     return priorities.get(priority, 0)
 
-# Função para validar se as habilidades do operador atendem pelo menos 50% das habilidades da ordem
+# Função para validar se as habilidades do operator atendem pelo menos 50% das habilidades da ordem
 def meets_minimum_skills(operator_skills, required_skills):
     """
-    Verifica se o operador atende pelo menos 50% das habilidades necessárias para a ordem.
+    Verifica se o operador atende a pelo menos 50% das habilidades necessárias para a ordem.
 
     Args:
-        operator_skills (list): Habilidades do operador.
-        required_skills (list): Habilidades exigidas pela ordem.
+        operator_skills (dict): Habilidades do operador (habilidade: nível).
+        required_skills (dict): Habilidades exigidas pela ordem (habilidade: nível).
 
     Returns:
-        bool: True se o operador atender pelo menos 50% das habilidades, False caso contrário.
+        bool: True se o operador atender a pelo menos 50% das habilidades, False caso contrário.
     """
-    matching_skills = sum(1 for skill in required_skills if skill in operator_skills)
+    matching_skills = sum(
+        1 for skill, required_level in required_skills.items()
+        if skill in operator_skills and skill_level_to_number(operator_skills[skill]) >= skill_level_to_number(required_level)
+    )
     return matching_skills / len(required_skills) >= 0.5
 
 # Função para criação de uma solução inicial
@@ -179,6 +185,7 @@ def create_initial_solution(operators, orders, days=5):
     unassigned_orders = list(orders.keys())
 
     for order_id in unassigned_orders:
+        # 
         valid_operators = [
             op_id for op_id, operator in operators.items()
             if meets_minimum_skills(operator["skills"], orders[order_id]["required_skills"])
@@ -194,7 +201,7 @@ def create_initial_solution(operators, orders, days=5):
 def calculate_fitness(solution, operators, orders):
     """
     Calcula a pontuação de aptidão de uma solução. A função avalia como uma solução de alocação de ordens a operadores
-    é eficaz, levando em consideração a compatibilidade das habilidades, o cumprimento de prazo e o excesso de horas
+    é eficaz, levando em consideração a compatibilidade das habilidades, o cumprimento de prazos e o excesso de horas
     trabalhadas por cada operador.
 
     Args:
@@ -209,18 +216,14 @@ def calculate_fitness(solution, operators, orders):
     Detalhes:
     - A função leva em consideração três critérios principais para calcular a aptidão de uma solução:
         1. **Compatibilidade de habilidades**: A habilidade do operador deve ser compatível com a habilidade necessária para a ordem de serviço.
-        2. **Cumprimento do inicio_esperado**: A solução penaliza ordens que não são completadas dentro do inicio_esperado estipulado pela ordem de serviço.
+        2. **Cumprimento do prazo**: A solução penaliza ordens que não são completadas dentro do prazo estipulado pela ordem de serviço.
         3. **Excesso de horas**: Penaliza a alocação de mais horas do que a capacidade diária do operador.
 
     Penalidades:
     - **Compatibilidade de habilidades**: Quando a habilidade de um operador não é adequada à ordem, a pontuação é penalizada. A penalidade depende do nível de habilidade do operador em comparação com o nível necessário para a ordem.
-    - **Cumprimento do inicio_esperado**: Se a ordem não for completada até o dia limite, é aplicada uma penalidade proporcional à quantidade de dias de atraso e à prioridade da ordem.
+    - **Cumprimento do prazo**: Se a ordem não for completada até o dia limite, é aplicada uma penalidade proporcional à quantidade de dias de atraso e à prioridade da ordem.
     - **Excesso de horas**: Se a soma das horas estimadas para a ordem ultrapassar as horas trabalhadas disponíveis para o operador em um dia, uma penalidade por excesso de horas será aplicada.
     - **
-
-
-    TODO:
-    aplicar o percentual de match de habilidades no score
 
     A pontuação de aptidão final é a soma das pontuações de compatibilidade, penalidades de atraso e excesso de horas.
     """
@@ -240,17 +243,29 @@ def calculate_fitness(solution, operators, orders):
 
                 # Avaliação de compatibilidade de habilidades: Como as habilidades do operador atendem aos requisitos da ordem.
                 skill_match_score = 0
-                if meets_minimum_skills(operator["skills"], order["required_skills"]):
-                    skill_match_score += 10
-                else:
-                    skill_match_score -= 10
+                for required_skill, required_level in order["required_skills"].items():
+                    # Se o operador tem a habilidade necessária para a ordem.
+                    if required_skill in operator["skills"]:
+                        operator_level_num = skill_level_to_number(operator["skills"][required_skill])  # Nível do operador na habilidade.
+                        required_level_num = skill_level_to_number(required_level)  # Nível necessário da habilidade.
 
-                # Avaliação da prioridade e do cumprimento do inicio_esperado:
+                        # Calcula a pontuação de compatibilidade de habilidades.
+                        # Se o operador tem o nível necessário ou maior, a pontuação é positiva.
+                        # Se o operador tem um nível inferior, a pontuação é penalizada.
+                        skill_match_score += (
+                            5 * (operator_level_num / required_level_num) if operator_level_num >= required_level_num
+                            else 2 * (operator_level_num / required_level_num)  # Penaliza proporcionalmente.
+                        )
+                    else:
+                        # Penalização severa se o operador não possui a habilidade necessária
+                        skill_match_score -= 10
+
+                # Avaliação da prioridade e do cumprimento do prazo:
                 priority_multiplier = priority_to_number(order["priority"])  # Multiplicador de prioridade para penalidades e bônus.
 
-                # Se a ordem foi concluída após o inicio_esperado, penaliza a solução:
-                if day > order["expected_start_day"]:  # Se o dia atual ultrapassa o inicio_esperado da ordem.
-                    days_late = day - order["expected_start_day"]  # Quantidade de dias de atraso.
+                # Se a ordem foi concluída após o prazo, penaliza a solução:
+                if day > order["deadline_days"]:  # Se o dia atual ultrapassa o prazo da ordem.
+                    days_late = day - order["deadline_days"]  # Quantidade de dias de atraso.
                     fitness -= 5 * priority_multiplier * days_late  # Penaliza com base na prioridade e atraso.
 
                 # Aumenta a pontuação de aptidão com base na compatibilidade de habilidades e na prioridade.
@@ -321,6 +336,36 @@ def crossover(parent1, parent2, operators, orders):
     return child
 
 
+# Função para alocar ordens não alocadas
+def allocate_unassigned_orders(solution, operators, orders, days=5):
+    """
+    Aloca ordens não alocadas a operadores válidos.
+
+    Args:
+        solution (dict): A solução atual, contendo a alocação de ordens a operadores por dia.
+        operators (dict): Dicionário de operadores, contendo suas habilidades e horários.
+        orders (dict): Dicionário de ordens de serviço, contendo as habilidades necessárias, horas estimadas, etc.
+        days (int): Número de dias do planejamento.
+
+    Returns:
+        dict: A solução ajustada com todas as ordens alocadas.
+    """
+    assigned_orders = {order_id for day in solution for operator in solution[day] for order_id in solution[day][operator]}
+    unassigned_orders = set(orders.keys()) - assigned_orders
+
+    for order_id in unassigned_orders:
+        valid_operators = [
+            op_id for op_id, operator in operators.items()
+            if meets_minimum_skills(operator["skills"], orders[order_id]["required_skills"])
+        ]
+        if valid_operators:
+            day = random.randint(0, days-1)
+            operator = random.choice(valid_operators)
+            solution[day][operator].append(order_id)
+
+    return solution
+
+# Função para realizar a mutação em uma solução, aceitando apenas mutações benéficas
 def mutate(solution, operators, orders, mutation_rate=0.1):
     """
     Realiza a mutação em uma solução, aceitando apenas mutações benéficas.
@@ -336,7 +381,7 @@ def mutate(solution, operators, orders, mutation_rate=0.1):
 
     Detalhes:
     - A mutação é realizada trocando ordens aleatórias entre dois operadores no mesmo dia.
-    - Verifica se na mutação realizada, as habilidades do operador atendem os requisitos da ordem.
+    - Verifica se na mutação realizada, as habilidades do operador atendem o requisito mínimo de pelo menos 50% das habilidades da ordem.
     - A solução é validada antes e depois da mutação, e se a mutação não melhorar a aptidão, ela é desfeita.
     """
     mutated = solution.copy()
@@ -355,7 +400,7 @@ def mutate(solution, operators, orders, mutation_rate=0.1):
                     # Troca as ordens entre os dois operadores
                     order1, order2 = mutated[day][op1][idx1], mutated[day][op2][idx2]
                     
-                    # Verifica se as trocas realizadas atendem os requisitos das habilidades
+                    # Verifica se as trocas realizadas atendem o requisito mínimo de pelo menos 50% das habilidades
                     if meets_minimum_skills(operators[op2]["skills"], orders[order1]["required_skills"]) and meets_minimum_skills(operators[op1]["skills"], orders[order2]["required_skills"]):
                         mutated[day][op1][idx1], mutated[day][op2][idx2] = order2, order1
 
@@ -367,51 +412,18 @@ def mutate(solution, operators, orders, mutation_rate=0.1):
                         if new_fitness < original_fitness:
                             mutated[day][op1][idx1], mutated[day][op2][idx2] = order1, order2
 
-    return mutated
+    temp_mutated = allocate_unassigned_orders(mutated, operators, orders)
+    # Verifica novamente se a aptidão melhorou, e se não, desfaz a alocação
+
+    original_fitness = calculate_fitness(mutated, operators, orders)
+    new_fitness = calculate_fitness(temp_mutated, operators, orders)
+    # Se a nova solução for pior, desfaz a mutação
+    if new_fitness < original_fitness:
+        return temp_mutated
+    else:
+        return mutated
 
 # Função para converter a solução final em um DataFrame
-def solution_to_dataframe_actual(solution, operators, orders):
-    """
-    Converte a solução final de alocação de ordens a operadores em um DataFrame.
-
-    Args:
-        solution (dict): A solução final, contendo a alocação de ordens a operadores por dia.
-        operators (dict): Dicionário de operadores, contendo suas habilidades e horários.
-        orders (dict): Dicionário de ordens de serviço, contendo as habilidades necessárias, horas estimadas, etc.
-
-    Returns:
-        pd.DataFrame: Um DataFrame contendo a solução de alocação de ordens com informações detalhadas.
-
-    Detalhes:
-    - O DataFrame contém as colunas: dia, id do operador, id da ordem, habilidades da ordem, horas estimadas,
-      prioridade e inicio_esperado.
-    """
-    data = []
-
-    for day, assignments in solution.items():
-        for operator_id, order_ids in assignments.items():
-            for order_id in order_ids:
-                order = orders[order_id]
-                operator = operators[operator_id]
-
-                row = {
-                    "dia": day + 1,  # Dias começam de 1
-                    "id_operador": operator_id,
-                    "id_ordem": order_id,
-                    "habilidades_ordem": " | ".join(order["required_skills"]),  # Formatação das habilidades
-                    "habilidades_operador": " | ".join(operator["skills"]),
-                    "nivel_operador": operator["level"],
-                    "horas_estimadas": order["estimated_hours"],
-                    "horas_disponiveis": operator["hours_per_day"],
-                    "prioridade": order["priority"],
-                    "prazo": order["expected_start_day"]
-                }
-                data.append(row)
-
-    df = pd.DataFrame(data)
-    unassigned_orders = list(set(orders.keys() - set(df["id_ordem"].unique())))
-    return df, unassigned_orders
-
 def solution_to_dataframe(solution, operators, orders):
     """
     Converte a solução final de alocação de ordens a operadores em um DataFrame.
@@ -426,207 +438,34 @@ def solution_to_dataframe(solution, operators, orders):
 
     Detalhes:
     - O DataFrame contém as colunas: dia, id do operador, id da ordem, habilidades da ordem, horas estimadas,
-      prioridade e inicio_esperado, além das novas colunas de compatibilidade e habilidades não atendidas.
+      prioridade e prazo.
     """
     data = []
-    operator_daily_hours = {}
 
     for day, assignments in solution.items():
-        if day not in operator_daily_hours:
-            operator_daily_hours[day] = {}
-
         for operator_id, order_ids in assignments.items():
-            if operator_id not in operator_daily_hours[day]:
-                operator_daily_hours[day][operator_id] = 0
-
             for order_id in order_ids:
                 order = orders[order_id]
                 operator = operators[operator_id]
 
-                # Calcular compatibilidade de habilidades
-                required_skills = set(order["required_skills"])
-                operator_skills = set(operator["skills"])
-
-                matched_skills = required_skills & operator_skills
-                missing_skills = required_skills - operator_skills
-
-                skill_compatibility = len(matched_skills) / len(required_skills) if required_skills else 1.0
-
-                # Verificar compatibilidade do nível com a prioridade
-                priority_level_map = {
-                    "alta": ["especialista", "sênior"],
-                    "urgente": ["especialista", "sênior"],
-                    "média": ["especialista", "sênior", "pleno"],
-                    "baixa": ["especialista", "sênior", "pleno", "júnior"]
-                }
-
-                priority = order["priority"]
-                operator_level = operator["level"]
-
-                compatibility_level = (
-                    "OK" if operator_level in priority_level_map.get(priority, []) else "NOK"
-                )
-
-                # Acumular horas do operador no dia
-                operator_daily_hours[day][operator_id] += order["estimated_hours"]
-                total_hours = operator_daily_hours[day][operator_id]
-                extra_hours = "Sim" if total_hours > operator["hours_per_day"] else "Não"
-                total_extra_hours = total_hours - operator["hours_per_day"]
                 row = {
                     "dia": day + 1,  # Dias começam de 1
                     "id_operador": operator_id,
                     "id_ordem": order_id,
-                    "habilidades_ordem": " | ".join(order["required_skills"]),  # Formatação das habilidades
-                    "habilidades_operador": " | ".join(operator["skills"]),
-                    "nivel_operador": operator["level"],
+                    "habilidades_ordem": " | ".join([skill+" "+level for skill, level in order["required_skills"].items()]),  # Formatação das habilidades
+                    "habilidades_operador": " | ".join([skill+" "+level for skill, level in operator["skills"].items()]),
                     "horas_estimadas": order["estimated_hours"],
                     "horas_disponiveis": operator["hours_per_day"],
                     "prioridade": order["priority"],
-                    "inicio_esperado": order["expected_start_day"],
-                    "atraso": day + 1 - order["expected_start_day"],
-                    "compatibilidade_habilidade": round(skill_compatibility * 100, 2),
-                    "habilidades_nao_atendidas": " | ".join(missing_skills),
-                    "compatibilidade_nivel_prioridade": compatibility_level,
-                    "hora_extra": extra_hours,
-                    "total_hora_extra": 0 if total_extra_hours <= 0 else total_extra_hours,
-                    
+                    "prazo": order["deadline_days"]
                 }
-
                 data.append(row)
 
     df = pd.DataFrame(data)
-    unassigned_orders = list(set(orders.keys()) - set(df["id_ordem"].unique()))
+
+    unassigned_orders = list(set(orders.keys() - set(df["id_ordem"].unique())))
+    
     return df, unassigned_orders
-
-
-
-def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
-    """
-    Imprime um relatório detalhado da alocação de ordens de serviço.
-    
-    Args:
-        df (pd.DataFrame): DataFrame com a solução de alocação
-        unassigned_orders (list): Lista de ordens não alocadas
-        operators (dict): Dicionário com informações dos operadores
-        orders (dict): Dicionário com informações das ordens
-    """
-    print("\n" + "="*80)
-    print("RELATÓRIO DETALHADO DE ALOCAÇÃO".center(80))
-    print("="*80)
-
-    # 1. Estatísticas Gerais
-    total_ordens = len(orders)
-    ordens_alocadas = len(df['id_ordem'].unique())
-    ordens_nao_alocadas = len(unassigned_orders)
-
-    print("\n1. ESTATÍSTICAS GERAIS")
-    print("-"*40)
-    print(f"Total de Ordens: {total_ordens}")
-    print(f"Ordens Alocadas: {ordens_alocadas} ({(ordens_alocadas/total_ordens)*100:.1f}%)")
-    print(f"Ordens Não Alocadas: {ordens_nao_alocadas}")
-
-    # 2. Análise por Prioridade
-    print("\n2. ANÁLISE POR PRIORIDADE")
-    print("-"*40)
-    for prioridade in ['urgente', 'alta', 'média', 'baixa']:
-        count = len(df[df['prioridade'] == prioridade])
-        if count > 0:
-            print(f"Prioridade {prioridade:8s}: {count:3d} ordens ({(count/ordens_alocadas)*100:5.1f}%)")
-
-    # 3. Análise por Operador
-    print("\n3. ANÁLISE POR OPERADOR")
-    print("-"*40)
-    for operador in df['id_operador'].unique():
-        df_op = df[df['id_operador'] == operador]
-        horas_total = df_op['horas_estimadas'].sum()
-        horas_disp = df_op['horas_disponiveis'].iloc[0]
-        n_ordens = len(df_op)
-        print(f"Operador {operador}:")
-        print(f"  - Ordens alocadas: {n_ordens}")
-        print(f"  - Horas alocadas: {horas_total:.1f}h de {horas_disp:.1f}h ({(horas_total/horas_disp)*100:.1f}%)")
-
-    # 4. Análise de Prazos
-    print("\n4. ANÁLISE DE PRAZOS")
-    print("-"*40)
-    
-    ordens_no_prazo = len(df[df['atraso'] <= 0])
-    print(f"Ordens no Prazo: {ordens_no_prazo} ({(ordens_no_prazo/ordens_alocadas)*100:.1f}%)")
-    
-    if len(df[df['atraso'] > 0]) > 0:
-        print("\nDetalhamento dos Atrasos:")
-        for _, row in df[df['atraso'] > 0].iterrows():
-            print(f"  Ordem {row['id_ordem']}: {row['atraso']} dias de atraso (Prioridade: {row['prioridade']})")
-
-    # 5. Análise de Habilidades
-    print("\n5. ANÁLISE DE COMPATIBILIDADE")
-    print("-"*40)
-    
-    def verificar_compatibilidade(row):
-        req_skills = set(row['habilidades_ordem'].split(" | "))
-        op_skills = set(row['habilidades_operador'].split(" | "))
-        return len(req_skills.intersection(op_skills)) / len(req_skills)
-
-    # df['compatibilidade_habilidade'] = df.apply(verificar_compatibilidade, axis=1)
-    matches_perfeitos = len(df[df['compatibilidade_habilidade'] == 1])
-    
-    print(f"Matches Perfeitos: {matches_perfeitos} ({(matches_perfeitos/ordens_alocadas)*100:.1f}%)")
-    print(f"Compatibilidade Média: {df['compatibilidade_habilidade'].mean()*100:.1f}%")
-
-    # 6. Análise por Dia
-    print("\n6. DISTRIBUIÇÃO POR DIA")
-    print("-"*40)
-    for dia in sorted(df['dia'].unique()):
-        df_dia = df[df['dia'] == dia]
-        print(f"\nDia {dia}:")
-        print(f"  - Total de Ordens: {len(df_dia)}")
-        print(f"  - Horas Alocadas: {df_dia['horas_estimadas'].sum():.1f}h")
-        print(f"  - Distribuição de Prioridades:")
-        for prioridade in ['urgente', 'alta', 'média', 'baixa']:
-            count = len(df_dia[df_dia['prioridade'] == prioridade])
-            if count > 0:
-                print(f"    * {prioridade:8s}: {count:3d}")
-
-    # 7. Ordens Não Alocadas
-    if unassigned_orders:
-        print("\n7. ORDENS NÃO ALOCADAS")
-        print("-"*40)
-        print(f"Total de ordens não alocadas: {len(unassigned_orders)}")
-        
-        # Agrupa por prioridade
-        unassigned_by_priority = {}
-        for order_id in unassigned_orders:
-            priority = orders[order_id]['priority']
-            if priority not in unassigned_by_priority:
-                unassigned_by_priority[priority] = []
-            unassigned_by_priority[priority].append(order_id)
-        
-        for priority in ['urgente', 'alta', 'média', 'baixa']:
-            if priority in unassigned_by_priority:
-                orders_list = unassigned_by_priority[priority]
-                print(f"\nPrioridade {priority}: {len(orders_list)} ordens")
-                for order_id in orders_list:
-                    order = orders[order_id]
-                    print(f"  - {order_id}: "
-                          f"Skills={', '.join(order['required_skills'])}, "
-                          f"Horas={order['estimated_hours']}, "
-                          f"Prazo={order['expected_start_day']}")
-
-    print("\n" + "="*80)
-    print("FIM DO RELATÓRIO".center(80))
-    print("="*80)
-
-    # Retorna métricas principais para uso no algoritmo genético
-    return {
-        'total_ordens': total_ordens,
-        'ordens_alocadas': ordens_alocadas,
-        'ordens_nao_alocadas': ordens_nao_alocadas,
-        'taxa_alocacao': (ordens_alocadas/total_ordens)*100,
-        'matches_perfeitos': matches_perfeitos,
-        'taxa_matches_perfeitos': (matches_perfeitos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
-        'compatibilidade_media': df['compatibilidade_habilidade'].mean()*100 if not df.empty else 0,
-        'ordens_no_prazo': ordens_no_prazo,
-        'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
-    }
 
 # Função para executar o algoritmo genético
 def run_genetic_algorithm(operators, orders, population_size=50, generations=100, mutation_rate=0.4, elitism_size=5, reinitalize_interval=10):
@@ -656,17 +495,16 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
     for generation in range(generations):
         # Cálculo da aptidão de cada solução
         fitness_scores = [calculate_fitness(solution, operators, orders) for solution in population]
-        
-        # Ajuste na taxa de mutação conforme o número da geração
-        mutation_rate = mutation_rate - (generation / generations) * 0.05  # Reduz a taxa de mutação
-        if mutation_rate < 0.05:
-            mutation_rate = 0.05  # Taxa mínima de mutação
 
+        # # Ajuste na taxa de mutação conforme o número da geração
+        # mutation_rate = mutation_rate - (generation / generations) * 0.1  # Reduz a taxa de mutação
+        # if mutation_rate < 0.05:
+        #     mutation_rate = 0.05  # Taxa mínima de mutação
 
         # Exibição da aptidão da melhor solução da geração
         best_fitness = max(fitness_scores)
         print(f"\nGeneration {generation + 1}/{generations} - Best Fitness: {best_fitness:.2f} - Mutation Rate: {mutation_rate:.4f}")
-        # time.sleep(0.1)  # Delay para animação
+        time.sleep(0.1)  # Delay para animação
 
         # Seleção dos pais
         parents = []
@@ -697,10 +535,10 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
 
     # Após as gerações, mostra a melhor solução
     best_solution = max(population, key=lambda sol: calculate_fitness(sol, operators, orders))
+    # best_solution = allocate_unassigned_orders(best_solution, operators, orders)
     print(f"\nBest solution fitness: {calculate_fitness(best_solution, operators, orders):.2f}")
 
-    # Converte a melhor solução para DataFrame e imprime os resultados
-    df, unassigned_orders = solution_to_dataframe(best_solution, operators, orders)
-    # imprimir_resultados_alocacao(df, unassigned_orders, operators, orders)
-    
-    return df, unassigned_orders
+    # Converte a melhor solução para DataFrame
+    df = solution_to_dataframe(best_solution, operators, orders)
+    return df
+

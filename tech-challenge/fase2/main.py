@@ -58,26 +58,7 @@ def run_genetic_algorithm(_N_ORDERS, _N_OPERATORS):
     if len(unassigned_orders) > 0:
         print("\n As ordens abaixo não puderam ser alocadas: ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    final_df.to_csv("resultado_genetic.csv", index=False)
-
-def main():
-    parser = argparse.ArgumentParser(description="Escolha o algoritmo de alocação a ser utilizado.")
-    parser.add_argument('--algorithm', choices=['linear', 'greedy', 'genetic'], help="Algoritmo de alocação a ser utilizado: 'linear', 'greedy' ou 'genetic'")
-    args = parser.parse_args()
-
-    # Parâmetros
-    _N_ORDERS = 100
-    _N_OPERATORS = 15
-
-    algorithms = ['genetic', 'greedy', 'linear'] if args.algorithm is None else [args.algorithm]
-
-    for algorithm in algorithms:
-        if algorithm == 'genetic':
-            run_genetic_algorithm(_N_ORDERS, _N_OPERATORS)
-        elif algorithm == 'linear':
-            run_linear_algorithm(_N_ORDERS, _N_OPERATORS)
-        elif algorithm == 'greedy':
-            run_greedy_algorithm(_N_ORDERS, _N_OPERATORS)
-
-if __name__ == "__main__":
-    main()
+    
+    final_df.to_csv("resultado.csv", index=False)
+    final_df.to_excel("resultado.xlsx", index=False)
+        
