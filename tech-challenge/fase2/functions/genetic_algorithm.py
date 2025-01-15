@@ -5,7 +5,7 @@ import time
 # Função para criar os dados de exemplo
 def create_sample_data(n_orders=None, n_operators=None):
     """
-    Cria dados simulados de operadores e ordens de serviço. Se 'n_operators' for fornecido, gera operadores e ordens automaticamente.
+    Inicializa dados simulados de operadores e ordens de serviço. Se 'n_operators' for fornecido, gera operadores e ordens automaticamente.
 
     Args:
         n_orders (int): Número de ordens de serviço a serem criadas.
@@ -19,7 +19,7 @@ def create_sample_data(n_orders=None, n_operators=None):
     - As ordens de serviço são geradas com habilidades, horas estimadas, prioridade e inicio_esperado de forma aleatória.
     """
     skills = ["pintura", "elétrica", "alvenaria", "hidráulica", "solda"]
-    skill_levels = ["júnior", "pleno", "sênior", "especialista"]
+    skills_level = ["júnior", "pleno", "sênior", "especialista"]
     priority_levels = ["baixa", "média", "alta", "urgente"]
 
     # Geração automática de operadores, se n_operators for fornecido
@@ -29,7 +29,7 @@ def create_sample_data(n_orders=None, n_operators=None):
             op_id = f"op{i}"
             num_skills = random.randint(2, 3)
             op_skills = random.sample(skills, num_skills)
-            level = random.choice(skill_levels)
+            level = random.choice(skills_level)
             shift = random.choice(["manhã", "tarde", "noite"])
             hours_per_day = random.randint(7, 9)
             operators[op_id] = {"skills": op_skills, "level": level, "shift": shift, "hours_per_day": hours_per_day}
@@ -498,8 +498,6 @@ def solution_to_dataframe(solution, operators, orders):
     unassigned_orders = list(set(orders.keys()) - set(df["id_ordem"].unique()))
     return df, unassigned_orders
 
-
-
 def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
     """
     Imprime um relatório detalhado da alocação de ordens de serviço.
@@ -628,6 +626,41 @@ def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
         'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
     }
 
+# Função para determinar o status das ordens
+def update_order_status(solution, orders):
+    """
+    Atualiza o status das ordens com base na solução fornecida.
+
+    Args:
+        solution: Solução atual contendo dias, operadores e ordens atribuídas.
+        orders: Dicionário de ordens com informações como `expected_start_day`.
+
+    Returns:
+        dict: Dicionário de ordens atualizado com os novos status.
+    """
+    # Redefine o status de todas as ordens para "não atendida" inicialmente
+    for order_id in orders:
+        orders[order_id]["status"] = "não atendida"
+
+    # Atualiza o status com base na solução
+    for day, operators in solution.items():
+        for assigned_orders in operators.values():
+            # Verifica se assigned_orders é uma lista
+            if not isinstance(assigned_orders, list):
+                raise TypeError(f"Esperado uma lista de ordens, mas recebeu: {type(assigned_orders)}")
+
+            for order_id in assigned_orders:
+                # Verifica se order_id é válido e se existe em orders
+                if not isinstance(order_id, (int, str)):
+                    raise TypeError(f"Esperado um identificador de ordem (int ou str), mas recebeu: {type(order_id)}")
+                if order_id in orders:
+                    order = orders[order_id]
+                    if day == order["expected_start_day"]:
+                        order["status"] = "atendida"
+                    elif day > order["expected_start_day"]:
+                        order["status"] = "atrasada"
+    return orders
+    
 # Função para executar o algoritmo genético
 def run_genetic_algorithm(operators, orders, population_size=50, generations=100, mutation_rate=0.4, elitism_size=5, reinitalize_interval=10):
     """
