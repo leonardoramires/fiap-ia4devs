@@ -14,7 +14,7 @@ def greedy_allocation(operators, orders, days=5):
         dict: Solução de alocação de ordens a operadores por dia.
     """
     # Ordena as ordens de serviço por prioridade (decrescente) e prazo (crescente)
-    sorted_orders = sorted(orders.items(), key=lambda x: (-F.priority_to_number(x[1]['priority']), x[1]['deadline_days']))
+    sorted_orders = sorted(orders.items(), key=lambda x: (-F.priority_to_number(x[1]['priority']), x[1]['expected_start_day']))
 
     # Inicializa a solução
     solution = {day: {op: [] for op in operators.keys()} for day in range(days)}
