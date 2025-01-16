@@ -52,19 +52,20 @@ def create_sample_data(n_orders=None, n_operators=None):
                 "estimated_hours": random.randint(2, 8),
                 "priority": random.choice(priority_levels),
                 "expected_start_day": random.randint(1, 5),
+                "status": "não_atendida",
             }
     else:
         service_orders = {
-            'ordem1': {'required_skills': ['solda', 'alvenaria'], 'estimated_hours': 2, 'priority': 'média', 'expected_start_day': 3},
-            'ordem2': {'required_skills': ['pintura', 'hidráulica'], 'estimated_hours': 8, 'priority': 'alta', 'expected_start_day': 2},
-            'ordem3': {'required_skills': ['hidráulica'], 'estimated_hours': 5, 'priority': 'urgente', 'expected_start_day': 5},
-            'ordem4': {'required_skills': ['hidráulica', 'pintura'], 'estimated_hours': 2, 'priority': 'urgente', 'expected_start_day': 1},
-            'ordem5': {'required_skills': ['alvenaria'], 'estimated_hours': 5, 'priority': 'alta', 'expected_start_day': 3},
-            'ordem6': {'required_skills': ['alvenaria'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 5},
-            'ordem7': {'required_skills': ['elétrica'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 4},
-            'ordem8': {'required_skills': ['solda'], 'estimated_hours': 8, 'priority': 'baixa', 'expected_start_day': 5},
-            'ordem9': {'required_skills': ['pintura'], 'estimated_hours': 3, 'priority': 'baixa', 'expected_start_day': 4},
-            'ordem10': {'required_skills': ['alvenaria', 'solda'], 'estimated_hours': 2, 'priority': 'alta', 'expected_start_day': 5}
+            'ordem1': {'required_skills': ['solda', 'alvenaria'], 'estimated_hours': 2, 'priority': 'média', 'expected_start_day': 3, 'status':'não_atendida'},
+            'ordem2': {'required_skills': ['pintura', 'hidráulica'], 'estimated_hours': 8, 'priority': 'alta', 'expected_start_day': 2, 'status':'não_atendida'},
+            'ordem3': {'required_skills': ['hidráulica'], 'estimated_hours': 5, 'priority': 'urgente', 'expected_start_day': 5, 'status':'não_atendida'},
+            'ordem4': {'required_skills': ['hidráulica', 'pintura'], 'estimated_hours': 2, 'priority': 'urgente', 'expected_start_day': 1, 'status':'não_atendida'},
+            'ordem5': {'required_skills': ['alvenaria'], 'estimated_hours': 5, 'priority': 'alta', 'expected_start_day': 3, 'status':'não_atendida'},
+            'ordem6': {'required_skills': ['alvenaria'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 5, 'status':'não_atendida'},
+            'ordem7': {'required_skills': ['elétrica'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 4, 'status':'não_atendida'},
+            'ordem8': {'required_skills': ['solda'], 'estimated_hours': 8, 'priority': 'baixa', 'expected_start_day': 5, 'status':'não_atendida'},
+            'ordem9': {'required_skills': ['pintura'], 'estimated_hours': 3, 'priority': 'baixa', 'expected_start_day': 4, 'status':'não_atendida'},
+            'ordem10': {'required_skills': ['alvenaria', 'solda'], 'estimated_hours': 2, 'priority': 'alta', 'expected_start_day': 5, 'status':'não_atendida'}
         }
 
     return operators, service_orders
@@ -320,19 +321,19 @@ def crossover(parent1, parent2, operators, orders):
 
     return child
 
-
+# Função para realizar a mutação em um novo indivíduo
 def mutate(solution, operators, orders, mutation_rate=0.1):
     """
     Realiza a mutação em uma solução, aceitando apenas mutações benéficas.
 
     Args:
-        solution (dict): A solução atual, contendo a alocação de ordens a operadores por dia.
-        operators (dict): Dicionário de operadores, contendo suas habilidades e horários.
-        orders (dict): Dicionário de ordens de serviço, contendo as habilidades necessárias, horas estimadas, etc.
+        solution: A solução atual, contendo a alocação de ordens a operadores por dia.
+        operators: Dicionário de operadores, contendo suas habilidades e horários.
+        orders: Dicionário de ordens de serviço, contendo as habilidades necessárias, horas estimadas, etc.
         mutation_rate (float): Taxa de mutação, indicando a probabilidade de ocorrer uma mutação (entre 0 e 1).
 
     Returns:
-        dict: A solução mutada, se a mutação for benéfica, caso contrário, retorna a solução original.
+        mutated: A solução mutada, se a mutação for benéfica, caso contrário, retorna a solução original.
 
     Detalhes:
     - A mutação é realizada trocando ordens aleatórias entre dois operadores no mesmo dia.
@@ -412,6 +413,7 @@ def solution_to_dataframe_actual(solution, operators, orders):
     unassigned_orders = list(set(orders.keys() - set(df["id_ordem"].unique())))
     return df, unassigned_orders
 
+# Função para tranformar a solução encontrada em Dtaframe
 def solution_to_dataframe(solution, operators, orders):
     """
     Converte a solução final de alocação de ordens a operadores em um DataFrame.
@@ -489,7 +491,7 @@ def solution_to_dataframe(solution, operators, orders):
                     "compatibilidade_nivel_prioridade": compatibility_level,
                     "hora_extra": extra_hours,
                     "total_hora_extra": 0 if total_extra_hours <= 0 else total_extra_hours,
-                    
+                    "status": order["status"],
                 }
 
                 data.append(row)
@@ -498,6 +500,7 @@ def solution_to_dataframe(solution, operators, orders):
     unassigned_orders = list(set(orders.keys()) - set(df["id_ordem"].unique()))
     return df, unassigned_orders
 
+# Função para imprimir na tela o resultado do algoritmo.
 def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
     """
     Imprime um relatório detalhado da alocação de ordens de serviço.
@@ -636,26 +639,21 @@ def update_order_status(solution, orders):
         orders: Dicionário de ordens com informações como `expected_start_day`.
 
     Returns:
-        dict: Dicionário de ordens atualizado com os novos status.
+        orders: Dicionário de ordens atualizado com os novos status.
     """
-    # Redefine o status de todas as ordens para "não atendida" inicialmente
-    for order_id in orders:
-        orders[order_id]["status"] = "não atendida"
-
     # Atualiza o status com base na solução
     for day, operators in solution.items():
         for assigned_orders in operators.values():
             # Verifica se assigned_orders é uma lista
             if not isinstance(assigned_orders, list):
                 raise TypeError(f"Esperado uma lista de ordens, mas recebeu: {type(assigned_orders)}")
-
             for order_id in assigned_orders:
                 # Verifica se order_id é válido e se existe em orders
                 if not isinstance(order_id, (int, str)):
                     raise TypeError(f"Esperado um identificador de ordem (int ou str), mas recebeu: {type(order_id)}")
                 if order_id in orders:
                     order = orders[order_id]
-                    if day == order["expected_start_day"]:
+                    if day <= order["expected_start_day"]:
                         order["status"] = "atendida"
                     elif day > order["expected_start_day"]:
                         order["status"] = "atrasada"
