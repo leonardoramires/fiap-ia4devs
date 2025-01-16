@@ -540,11 +540,11 @@ def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
         df_op = df[df['id_operador'] == operador]
         horas_total = df_op['horas_estimadas'].sum()
         horas_disp = df_op['horas_disponiveis'].iloc[0]
+        percentual = (horas_total/(horas_disp*5))*100
         n_ordens = len(df_op)
         print(f"Operador {operador}:")
         print(f"  - Ordens alocadas: {n_ordens}")
-        print(f"  - Horas alocadas: {horas_total:.1f}h de {horas_disp:.1f}h ({(horas_total/horas_disp)*100:.1f}%)")
-
+        print(f"  - Horas alocadas: {horas_total:.1f}h de {horas_disp*5:.1f}h ({percentual:.1f}%)")
     # 4. Análise de Prazos
     print("\n4. ANÁLISE DE PRAZOS")
     print("-"*40)
@@ -557,21 +557,81 @@ def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
         for _, row in df[df['atraso'] > 0].iterrows():
             print(f"  Ordem {row['id_ordem']}: {row['atraso']} dias de atraso (Prioridade: {row['prioridade']})")
 
-    # 5. Análise de Habilidades
-    print("\n5. ANÁLISE DE COMPATIBILIDADE")
+    # 5. Análise de Atendimentos por Fitness
+    print("\n5. ANÁLISE DE ATENDIMENTOS POR FITNESS")
     print("-"*40)
     
-    def verificar_compatibilidade(row):
-        req_skills = set(row['habilidades_ordem'].split(" | "))
-        op_skills = set(row['habilidades_operador'].split(" | "))
-        return len(req_skills.intersection(op_skills)) / len(req_skills)
-
-    # df['compatibilidade_habilidade'] = df.apply(verificar_compatibilidade, axis=1)
-    matches_perfeitos = len(df[df['compatibilidade_habilidade'] == 1])
+    # Análise de atendimento baseada nos critérios do fitness
+    atendimentos = {
+        'total': [],
+        'parcial': [],
+        'inadequado': []
+    }
     
-    print(f"Matches Perfeitos: {matches_perfeitos} ({(matches_perfeitos/ordens_alocadas)*100:.1f}%)")
-    print(f"Compatibilidade Média: {df['compatibilidade_habilidade'].mean()*100:.1f}%")
+    for _, row in df.iterrows():
+        # Converte strings de habilidades em conjuntos para comparação
+        required_skills = set(row['habilidades_ordem'].split(" | "))
+        operator_skills = set(row['habilidades_operador'].split(" | "))
+        
+        # Calcula o percentual de match de habilidades
+        matching_skills = len(required_skills.intersection(operator_skills))
+        skill_match_percent = matching_skills / len(required_skills)
+        
+        # Verifica condições de atendimento
+        dentro_prazo = row['atraso'] <= 0
+        horas_ok = row['horas_estimadas'] <= row['horas_disponiveis']
+        
+        # Classifica o atendimento
+        if skill_match_percent == 1 and dentro_prazo and horas_ok:
+            atendimentos['total'].append(row['id_ordem'])
+        elif skill_match_percent >= 0.5:
+            atendimentos['parcial'].append(row['id_ordem'])
+        else:
+            atendimentos['inadequado'].append(row['id_ordem'])
 
+    # Imprime estatísticas gerais
+    total_atendidos = len(atendimentos['total'])
+    parcial_atendidos = len(atendimentos['parcial'])
+    inadequados = len(atendimentos['inadequado'])
+    
+    print("Estatísticas Gerais de Atendimento:")
+    print(f"  - Atendimento Total:    {total_atendidos:3d} ordens ({(total_atendidos/ordens_alocadas)*100:5.1f}%)")
+    print(f"  - Atendimento Parcial:  {parcial_atendidos:3d} ordens ({(parcial_atendidos/ordens_alocadas)*100:5.1f}%)")
+    print(f"  - Atendimento Inadequado: {inadequados:3d} ordens ({(inadequados/ordens_alocadas)*100:5.1f}%)")
+
+    # Análise detalhada por tipo de atendimento
+    print("\nDetalhamento dos Atendimentos:")
+    
+    if atendimentos['total']:
+        print("\nOrdens com Atendimento Total:")
+        for ordem_id in atendimentos['total']:
+            ordem = df[df['id_ordem'] == ordem_id].iloc[0]
+            print(f"  ✓ Ordem {ordem_id}: "
+                  f"Skills={ordem['habilidades_ordem']}, "
+                  f"Operador={ordem['id_operador']}, "
+                  f"Inicio Esperado={ordem['inicio_esperado']}, "
+                  f"Dia Alocado={ordem['dia']}")
+    
+    if atendimentos['parcial']:
+        print("\nOrdens com Atendimento Parcial:")
+        for ordem_id in atendimentos['parcial']:
+            ordem = df[df['id_ordem'] == ordem_id].iloc[0]
+            print(f"  ⚠ Ordem {ordem_id}: "
+                  f"Skills={ordem['habilidades_ordem']}, "
+                  f"Operador={ordem['id_operador']} ({ordem['habilidades_operador']}), "
+                  f"Inicio Esperado={ordem['inicio_esperado']}, "
+                  f"Dia Alocado={ordem['dia']}")
+    
+    if atendimentos['inadequado']:
+        print("\nOrdens com Atendimento Inadequado:")
+        for ordem_id in atendimentos['inadequado']:
+            ordem = df[df['id_ordem'] == ordem_id].iloc[0]
+            print(f"  ✗ Ordem {ordem_id}: "
+                  f"Skills={ordem['habilidades_ordem']}, "
+                  f"Operador={ordem['id_operador']} ({ordem['habilidades_operador']}), "
+                  f"Inicio Esperado={ordem['inicio_esperado']}, "
+                  f"Dia Alocado={ordem['dia']}")
+            
     # 6. Análise por Dia
     print("\n6. DISTRIBUIÇÃO POR DIA")
     print("-"*40)
@@ -621,12 +681,18 @@ def imprimir_resultados_alocacao(df, unassigned_orders, operators, orders):
         'ordens_alocadas': ordens_alocadas,
         'ordens_nao_alocadas': ordens_nao_alocadas,
         'taxa_alocacao': (ordens_alocadas/total_ordens)*100,
-        'matches_perfeitos': matches_perfeitos,
-        'taxa_matches_perfeitos': (matches_perfeitos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'matches_perfeitos': total_atendidos,
+        'taxa_matches_perfeitos': (total_atendidos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
         'compatibilidade_media': df['compatibilidade_habilidade'].mean()*100 if not df.empty else 0,
         'ordens_no_prazo': ordens_no_prazo,
-        'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
-    }
+        'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'atendimento_total': total_atendidos,
+        'atendimento_parcial': parcial_atendidos,
+        'atendimento_inadequado': inadequados,
+        'taxa_atendimento_total': (total_atendidos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'taxa_atendimento_parcial': (parcial_atendidos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'taxa_atendimento_inadequado': (inadequados/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
+     }
 
 # Função para executar o algoritmo genético
 def run_genetic_algorithm(operators, orders, population_size=50, generations=100, mutation_rate=0.4, elitism_size=5, reinitalize_interval=10):
