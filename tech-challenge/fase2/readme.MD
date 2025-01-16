@@ -22,194 +22,192 @@ Minimizar o número de horas extras trabalhadas pelos operadores.
 Garantir que as ordens de maior prioridade sejam atendidas dentro do prazo.
 
 
-## Melhorias implementadas durante a execução dos testes
+## O Projeto
+![Fluxograma Genético do Algoritmo Genético](assets/fluxograma.png)
+*Figura 1: Fluxograma Genérico do Algoritmo Genético*
 
-1. Reajuste nas funções de aptidão:
-    - Adição de pesos considerando a prioridade da OS para tornar proporcional o impacto das penalidades.
-    - Inclusão de penalização por horas extras realizadas, ajustando a penalização com base na prioridade da ordem.
+Este projeto foi desenvolvido utilizando um algoritmo genético para otimizar a alocação de ordens de serviço aos operadores. Abaixo estão os pontos essenciais da solução:
 
-2. Melhorias na função de crossover:
-    - Garantia de que cada ordem seja atribuída apenas uma vez, reduzindo a possibilidade de soluções inviáveis.
+### 1. Reajuste nas Funções de Aptidão
+- ✨ Adição de pesos considerando a prioridade da OS
+- 📊 Penalização proporcional por horas extras
 
-3. Processo de mutação:
-    - Verificação da qualidade da mutação. Se uma mutação leva a uma solução pior, a mutação é desfeita.
+### 2. Otimização do Crossover
+- 🔄 Garantia de atribuição única para cada ordem
+- 📉 Redução de soluções inviáveis
 
-4. Inclusão do Elitismo:
-    - Implementação de uma estratégia de elitismo, onde os melhores indivíduos da população são mantidos entre as gerações.
+### 3. Processo de Mutação Inteligente
+- 🧬 Verificação da qualidade pós-mutação
+- ↩️ Reversão automática de mutações prejudiciais
 
-5. Reinicialização da população:
-    - Reinicialização parcial da população a cada certo número de gerações para evitar convergência precoce para uma solução subótima.
+### 4. Sistema de Elitismo
+- 🏆 Preservação dos melhores indivíduos
+- 📈 Manutenção de soluções de alta qualidade entre gerações
 
-6. Regra de habilidades mínimas:
-    - Inclusão de uma regra para que os operadores atendam ao menos 50% das habilidades necessárias para evitar que uma pessoa desqualificada atenda a ordem.
+### 5. Gestão Populacional
+- 🔄 Reinicialização parcial periódica
+- 🎯 Prevenção de convergência prematura para uma solução subótima
 
+### 6. Controle de Qualificação
+- ✅ Exigência mínima de 50% das habilidades necessárias
+- 🚫 Prevenção de alocações inadequadas
 
 ## Detalhamento do Algoritmo Genético
 
-### Geração da População Inicial
-A população inicial é composta por um conjunto de soluções (indivíduos) geradas aleatoriamente. Cada solução representa uma possível alocação de ordens de serviço para operadores ao longo de um período de dias.
+### 1. Geração da População Inicial 🌱
 
-#### Passos para a Geração da População Inicial:
-1. **Criação de Soluções Iniciais**:
-   - Para cada solução, distribuímos as ordens de serviço aleatoriamente entre os operadores e dias.
-   - Garantimos que cada operador alocado tenha as habilidades necessárias para atender a ordem de serviço.
-   - Utilizamos a função `create_initial_solution` para gerar essas soluções iniciais.
+A população inicial consiste em um conjunto de soluções (indivíduos) geradas aleatoriamente, onde cada solução representa uma possível alocação de ordens de serviço ao longo do período de 5 dias.
 
-2. **Estrutura da Solução**:
-   - Cada solução é representada por um dicionário aninhado, onde as chaves são os dias e os valores são dicionários de operadores e suas respectivas ordens de serviço.
-   - Exemplo de estrutura: `{dia: {operador_id: [ordem_ids]}}`.
+#### Processo de Geração:
+- **Distribuição Aleatória**: As ordens são distribuídas entre operadores e dias
+- **Validação de Habilidades**: Garantia de compatibilidade entre operador e ordem
+- **Estrutura**: `{dia: {operador_id: [ordem_ids]}}`
 
-### Processo de Seleção
-A seleção é o processo de escolher quais soluções (pais) serão utilizadas para gerar novas soluções (filhos) na próxima geração. Utilizamos um método de torneio para a seleção.
+### 2. Processo de Seleção 🎯
 
-#### Passos para a Seleção:
-1. **Torneio**:
-   - Selecionamos aleatoriamente um grupo de soluções (torneio) da população.
-   - Avaliamos a aptidão de cada solução no torneio.
-   - Escolhemos a solução com a melhor aptidão como um dos pais.
+Utilizamos o método de torneio para selecionar as soluções (pais) que gerarão a próxima geração.
 
-2. **Repetição**:
-   - Repetimos o processo de torneio até selecionar o número necessário de pais para gerar a nova população.
+#### Etapas do Torneio:
+1. Seleção aleatória de um grupo de soluções
+2. Avaliação da aptidão de cada solução
+3. Escolha da melhor solução como pai
+4. Repetição até atingir o número necessário de pais
 
-### Processo de Crossover
-O crossover é o processo de combinar duas soluções (pais) para gerar uma nova solução (filho). Utilizamos um ponto de crossover para dividir as soluções dos pais e combiná-las.
+### 3. Processo de Crossover 🔄
 
-#### Passos para o Crossover:
-1. **Ponto de Crossover**:
-   - Escolhemos aleatoriamente um ponto de crossover que divide os dias da solução.
-   - Exemplo: Se temos 5 dias, o ponto de crossover pode ser 2, dividindo a solução em dois segmentos (dias 1-2 e dias 3-5).
+O crossover combina duas soluções (pais) para gerar uma nova solução (filho).
 
-2. **Combinação de Segmentos**:
-   - O primeiro segmento da solução do filho é copiado do primeiro pai até o ponto de crossover.
-   - O segundo segmento da solução do filho é copiado do segundo pai após o ponto de crossover.
+#### Metodologia:
+1. **Seleção do Ponto**: 
+   - Escolha aleatória do ponto de divisão
+   - Exemplo: Em 5 dias, ponto 2 = dias [1-2] + [3-5]
 
-3. **Garantia de Viabilidade**:
-   - Garantimos que cada ordem de serviço seja atribuída apenas uma vez.
-   - Se alguma ordem não for atribuída após o crossover, ela é atribuída aleatoriamente a um operador em um dia aleatório.
+2. **Combinação**:
+   - Primeiro segmento do pai 1
+   - Segundo segmento do pai 2
+   - Garantia de atribuição única para cada ordem
 
-### Processo de Mutação
-A mutação é o processo de introduzir pequenas alterações em uma solução para promover a diversidade genética. Realizamos a mutação trocando ordens aleatórias entre dois operadores no mesmo dia.
+### 4. Processo de Mutação 🧬
 
-#### Passos para a Mutação:
-1. **Probabilidade de Mutação**:
-   - Para cada dia na solução, verificamos se a mutação deve ocorrer com base em uma taxa de mutação predefinida.
+A mutação introduz variações nas soluções para manter a diversidade genética.
 
-2. **Troca de Ordens**:
-   - Selecionamos aleatoriamente dois operadores no mesmo dia.
-   - Trocamos ordens aleatórias entre esses operadores.
+#### Procedimento:
+1. **Verificação**: Probabilidade de mutação por dia
+2. **Execução**: 
+   - Seleção de dois operadores no mesmo dia
+   - Troca de ordens entre eles
+3. **Validação**: 
+   - Avaliação pré e pós-mutação
+   - Reversão se não houver melhoria
 
-3. **Verificação de Qualidade**:
-   - Avaliamos a aptidão da solução antes e depois da mutação.
-   - Se a mutação não melhorar a aptidão, desfazemos a mutação.
+### 5. Função de Aptidão ⚖️
 
-### Construção da Função de Aptidão
-A função de aptidão avalia a qualidade de uma solução com base em critérios específicos. No nosso caso, consideramos a compatibilidade das habilidades, o cumprimento de prazos e o excesso de horas trabalhadas.
+Avalia a qualidade das soluções considerando múltiplos critérios.
 
-#### Critérios da Função de Aptidão:
+#### Critérios de Avaliação:
 1. **Compatibilidade de Habilidades**:
-   - Avaliamos se as habilidades do operador atendem aos requisitos da ordem de serviço.
-   - Atribuímos uma pontuação positiva se as habilidades forem compatíveis e uma penalidade se não forem.
+   - Pontuação positiva para matches
+   - Penalidades para incompatibilidades
 
-2. **Cumprimento de Prazos**:
-   - Verificamos se as ordens de serviço são concluídas dentro do prazo estipulado.
-   - Aplicamos penalidades para ordens que não são completadas dentro do prazo, proporcionalmente à prioridade da ordem e ao número de dias de atraso.
+2. **Gestão de Prazos**:
+   - Verificação de conclusão no prazo
+   - Penalidades proporcionais a atrasos e prioridades
 
-3. **Excesso de Horas Trabalhadas**:
-   - Calculamos o total de horas trabalhadas por cada operador em um dia.
-   - Aplicamos penalidades para horas trabalhadas que excedem a capacidade diária do operador.
+3. **Controle de Horas**:
+   - Monitoramento de horas por operador
+   - Penalização por excesso
 
-#### Cálculo da Aptidão:
-- A aptidão final de uma solução é a soma das pontuações de compatibilidade, penalidades de atraso e penalidades por excesso de horas.
-- Utilizamos a função `calculate_fitness` para realizar esse cálculo.
+### 6. Fluxo do Algoritmo 🔄
 
-### Resumo do Algoritmo Genético
 1. **Inicialização**:
-   - Geramos uma população inicial de soluções aleatórias.
+   - Geração da população inicial
 
-2. **Evolução**:
-   - Para cada geração, calculamos a aptidão de cada solução.
-   - Selecionamos os melhores pais utilizando o método de torneio.
-   - Realizamos o crossover para gerar novos filhos.
-   - Aplicamos mutações para introduzir diversidade genética.
-   - Implementamos elitismo para manter as melhores soluções entre as gerações.
-   - Periodicamente reinicializamos parte da população para evitar convergência precoce.
+2. **Ciclo Evolutivo**:
+   - Cálculo de aptidão
+   - Seleção por torneio
+   - Crossover
+   - Mutação
+   - Elitismo
+   - Reinicialização parcial periódica
 
-3. **Resultado Final**:
-   - Após um número predefinido de gerações, a melhor solução encontrada é selecionada como a solução final.
-   - A solução final é convertida em um DataFrame para facilitar a visualização e análise.
-
-Este detalhamento fornece uma visão abrangente das técnicas e regras utilizadas na implementação do algoritmo genético para otimização da alocação de ordens de manutenção.
+3. **Finalização**:
+   - Seleção da melhor solução
+   - Conversão para DataFrame
 
 ## Informações gerais sobre o resultado do algoritmo
 
 A análise dos resultados do algoritmo genético para alocação de ordens de serviço de manutenção revela aspectos importantes sobre sua performance e limitações. O algoritmo foi desenvolvido para otimizar a distribuição de 100 ordens de serviço entre 15 operadores ao longo de 5 dias, considerando múltiplas variáveis como habilidades técnicas, prioridades e prazos.
 
-### Resultados Principais
+### 📊 Resultados Principais
 
-1. **Capacidade de Alocação**
-   - O algoritmo conseguiu alocar 100% das ordens de serviço (100 ordens)
-   - A distribuição contemplou todos os 15 operadores disponíveis
-   - Houve cobertura dos 5 dias do período analisado
+#### 1. Capacidade de Alocação ✅
+- O algoritmo conseguiu alocar 100% das ordens de serviço (100 ordens)
+- A distribuição contemplou todos os 15 operadores disponíveis
+- Houve cobertura dos 5 dias do período analisado
 
-2. **Distribuição Temporal**
-   - **Concentração nos Primeiros Dias**:
-     * Dia 1: 29 ordens (142 horas) - 28,3% do total de horas
-     * Dia 2: 23 ordens (104 horas) - 20,7% do total de horas
-     * Dia 3: 23 ordens (128 horas) - 25,5% do total de horas
-     * Dia 4: 11 ordens (62 horas) - 12,4% do total de horas
-     * Dia 5: 14 ordens (66 horas) - 13,1% do total de horas
+#### 2. Distribuição Temporal 📅
+**Concentração nos Primeiros Dias:**
+| Dia | Ordens | Horas | % do Total |
+|-----|---------|-------|------------|
+| 1 | 29 | 142 | 28,3% |
+| 2 | 23 | 104 | 20,7% |
+| 3 | 23 | 128 | 25,5% |
+| 4 | 11 | 62 | 12,4% |
+| 5 | 14 | 66 | 13,1% |
 
-3. **Gestão de Prioridades**
-   - **Distribuição por Nível de Prioridade**:
-     * Urgente: 26 ordens (26%)
-     * Alta: 28 ordens (28%)
-     * Média: 27 ordens (27%)
-     * Baixa: 19 ordens (19%)
+#### 3. Gestão de Prioridades ⚡
+**Distribuição por Nível:**
+| Prioridade | Quantidade | Percentual |
+|------------|------------|------------|
+| Urgente | 26 | 26% |
+| Alta | 28 | 28% |
+| Média | 27 | 27% |
+| Baixa | 19 | 19% |
 
-4. **Compatibilidade de Habilidades**
-   - A compatibilidade média ficou em 82%
-   - Foram necessárias adaptações para cobrir todas as ordens
+#### 4. Compatibilidade de Habilidades 🎯
+- A compatibilidade média ficou em 82%
+- Foram necessárias adaptações para cobrir todas as ordens
 
-### Desafios e Limitações Identificadas
+### 🚨 Desafios e Limitações Identificadas
 
-1. **Capacidade Operacional**
-   - O volume de trabalho excede significativamente a capacidade da equipe
-   - A média de horas extras por operador está muito acima do aceitável
-   - Possível necessidade de redimensionamento da equipe
+#### 1. Capacidade Operacional
+- O volume de trabalho excede significativamente a capacidade da equipe
+- A média de horas extras por operador está muito acima do aceitável
+- Possível necessidade de redimensionamento da equipe
 
-2. **Distribuição Temporal**
-   - Concentração excessiva nos primeiros três dias
-   - Subutilização da capacidade nos últimos dois dias
-   - Necessidade de melhor balanceamento da carga de trabalho
+#### 2. Distribuição Temporal
+- Concentração excessiva nos primeiros três dias
+- Subutilização da capacidade nos últimos dois dias
+- Necessidade de melhor balanceamento da carga de trabalho
 
-3. **Gestão de Prioridades**
-   - Atrasos em ordens urgentes indicam necessidade de ajustes no algoritmo
-   - O sistema de priorização atual pode não estar sendo suficientemente considerado
+#### 3. Gestão de Prioridades
+- Atrasos em ordens urgentes indicam necessidade de ajustes no algoritmo
+- O sistema de priorização atual pode não estar sendo suficientemente considerado
 
-4. **Compatibilidade Técnica**
-   - Ausência de matches perfeitos sugere possível necessidade de:
-     * Treinamento adicional para a equipe
-     * Revisão dos critérios de matching
-     * Possível contratação de especialistas em áreas específicas
+#### 4. Compatibilidade Técnica
+Ausência de matches perfeitos sugere possível necessidade de:
+- 📚 Treinamento adicional para a equipe
+- 🔄 Revisão dos critérios de matching
+- 👥 Possível contratação de especialistas em áreas específicas
 
-### Recomendações para Melhorias
+### 💡 Recomendações para Melhorias
 
-1. **Ajustes no Algoritmo**:
-   - Implementar pesos mais significativos para prioridades urgentes
-   - Melhorar a distribuição temporal das ordens
-   - Refinar os critérios de matching de habilidades
+#### 1. Ajustes no Algoritmo
+- Implementar pesos mais significativos para prioridades urgentes
+- Melhorar a distribuição temporal das ordens
+- Refinar os critérios de matching de habilidades
 
-2. **Recursos Humanos**:
-   - Avaliar a necessidade de contratações adicionais
-   - Identificar gaps de habilidades para treinamento
-   - Considerar a redistribuição de operadores entre turnos
+#### 2. Recursos Humanos
+- Avaliar a necessidade de contratações adicionais
+- Identificar gaps de habilidades para treinamento
+- Considerar a redistribuição de operadores entre turnos
 
-3. **Processos**:
-   - Revisar os critérios de classificação de prioridades
-   - Estabelecer limites mais rígidos para horas extras
-   - Implementar mecanismos de balanceamento de carga
+#### 3. Processos
+- Revisar os critérios de classificação de prioridades
+- Estabelecer limites mais rígidos para horas extras
+- Implementar mecanismos de balanceamento de carga
 
-Esta análise demonstra que, embora o algoritmo tenha conseguido alocar todas as ordens, existem oportunidades significativas de melhoria para otimizar a distribuição do trabalho e garantir uma operação mais sustentável e eficiente.
+> **Conclusão**: Esta análise demonstra que, embora o algoritmo tenha conseguido alocar todas as ordens, existem oportunidades significativas de melhoria para otimizar a distribuição do trabalho e garantir uma operação mais sustentável e eficiente.
 
 ### 1. Estatísticas gerais
 
@@ -420,6 +418,3 @@ Esta análise demonstra que, embora o algoritmo tenha conseguido alocar todas as
 | 5 | op9 | ordem81 | alvenaria \| solda | alvenaria | OK | Sim | 1 |
 | 3 | op9 | ordem88 | elétrica | | OK | Sim | 6 |
 | 4 | op9 | ordem93 | solda | | OK | Não | 0 |
-
-## Possíveis melhorias
-Esta seção apresenta possíveis melhorias para o algoritmo genético, considerando os resultados obtidos e as limitações identificadas durante a execução dos testes.
