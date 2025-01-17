@@ -3,6 +3,7 @@ from functions import algorithms
 from functions import common_functions as cf
 from functions import greedy_algorithm as ga
 from functions import linear_programming_algorithm as lp
+from functions import human_allocation as ha
 
 # Imports para o funcionamento do PyGame
 import pygame
@@ -41,24 +42,56 @@ params = {
 }
 
 def run_greedy_algorithm(_N_ORDERS, _N_OPERATORS):
+    print("="*35 + " Greedy Algorithm " + "="*35)
     operators, orders = cf.create_sample_data(_N_ORDERS, _N_OPERATORS)
     solution = ga.greedy_allocation(operators, orders)
     greedy_fitness = cf.calculate_fitness(solution, operators, orders)
     df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Greedy Algorithm):", greedy_fitness)
-    if unassigned_orders:
-        print("Ordens não atribuídas:", unassigned_orders)
+    if len(unassigned_orders) > 0:
+        orders_df = cf.orders_to_dataframe(orders)
+        print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
+        print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
     df.to_csv("resultado_greedy_programming.csv", index=False)
+    print("\n")
 
 def run_linear_algorithm(_N_ORDERS, _N_OPERATORS):
+    print("="*30 + " Linear Programming Algorithm " + "="*29)
     operators, orders = cf.create_sample_data(_N_ORDERS, _N_OPERATORS)
     solution = lp.linear_programming_allocation(operators, orders)
     linear_fitness = cf.calculate_fitness(solution, operators, orders)
     df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
-    print("Fitness (Algoritmo Linear):", linear_fitness)
-    if unassigned_orders:
-        print("Ordens não atribuídas:", unassigned_orders)
+    print("Fitness (Linear Programming):", linear_fitness)
+    if len(unassigned_orders) > 0:
+        orders_df = cf.orders_to_dataframe(orders)
+        print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
+        print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
     df.to_csv("resultado_linear_programming.csv", index=False)
+    print("\n")
+
+def run_human_allocation(_N_ORDERS, _N_OPERATORS):
+    print("="*35 + " Human Allocation " + "="*35)
+    operators, orders = cf.create_sample_data(_N_ORDERS, _N_OPERATORS)
+    solution = ha.human_allocation(operators, orders)
+    linear_fitness = cf.calculate_fitness(solution, operators, orders)
+    df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    print("Fitness (Alocação Humana):", linear_fitness)
+    if len(unassigned_orders) > 0:
+        orders_df = cf.orders_to_dataframe(orders)
+        print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
+        print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
+    df.to_csv("resultado_human_allocation.csv", index=False)
+    print("\n")
+
+def run_comparison_algorithms():
+    if "greedy_algorithm" in algorithms_to_perform:
+        run_greedy_algorithm(params["_N_ORDERS"], params["_N_OPERATORS"])
+    
+    if "linear_programming_algorithm" in algorithms_to_perform:
+        run_linear_algorithm(params["_N_ORDERS"], params["_N_OPERATORS"])
+
+    if "human_allocation" in algorithms_to_perform:
+        run_human_allocation(params["_N_ORDERS"], params["_N_OPERATORS"])
 
 if __name__ == '__main__':
     """
@@ -79,11 +112,8 @@ if __name__ == '__main__':
     # Inicializa operadores e ordens iniciais.
     operators, orders = cf.create_sample_data(params["_N_ORDERS"], params["_N_OPERATORS"])
 
-    if "greedy_algorithm" in algorithms_to_perform:
-        run_greedy_algorithm(params["_N_ORDERS"], params["_N_OPERATORS"])
-    
-    if "linear_programming_algorithm" in algorithms_to_perform:
-        run_linear_algorithm(params["_N_ORDERS"], params["_N_OPERATORS"])
+    # Executa os algoritmos de comparação
+    run_comparison_algorithms()    
 
     if "genetic_algorithm" not in algorithms_to_perform:
         exit()

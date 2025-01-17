@@ -257,3 +257,28 @@ def solution_to_dataframe(solution, operators, orders):
     df = pd.DataFrame(data)
     unassigned_orders = list(set(orders.keys()) - set(df["id_ordem"].unique()))
     return df, unassigned_orders
+
+def orders_to_dataframe(service_orders):
+    """
+    Converte um dicionário de ordens de serviço em um DataFrame do pandas.
+
+    Args:
+        service_orders (dict): Dicionário contendo os detalhes das ordens de serviço.
+
+    Returns:
+        pd.DataFrame: DataFrame contendo os detalhes das ordens de serviço.
+    """
+    # Converte as ordens de serviço em um DataFrame
+    service_orders_data = []
+    for order_id, details in service_orders.items():
+        service_orders_data.append({
+            "order_id": order_id,
+            "required_skills": " | ".join(details["required_skills"]),
+            "estimated_hours": details["estimated_hours"],
+            "priority": details["priority"],
+            "expected_start_day": details["expected_start_day"]
+        })
+
+    service_orders_df = pd.DataFrame(service_orders_data)
+
+    return service_orders_df
