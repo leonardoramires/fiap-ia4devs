@@ -125,7 +125,7 @@ def meets_minimum_skills(operator_skills, required_skills):
     return meets_minimum, match_percentage
 
 # Função para criação de uma solução inicial
-def create_initial_solution(operators, orders, days):
+def create_initial_solution(operators, orders, max_days):
     """
     Cria uma solução inicial aleatória, garantindo que apenas operadores com as habilidades necessárias
     sejam atribuídos às ordens.
@@ -142,8 +142,11 @@ def create_initial_solution(operators, orders, days):
     """
     # Inicializa a solução.
     solution = {
-        order_id: {"day": None, "operator": None, "status": "não atendida"}
-        for order_id in orders.keys()
+        "orders": {
+            order_id: {"day": None, "operator": None, "status": "não atendida"}
+            for order_id in orders.keys()
+        },
+        "fitness": 0,
     }
     
     for order_id, order_data in orders.items():
@@ -155,21 +158,21 @@ def create_initial_solution(operators, orders, days):
 
         if valid_operators:  # Apenas atribui se houver operadores válidos.
             # Atribui a ordem a um dia e operador aleatórios.
-            assigned_day = random.randint(1, days)
+            assigned_day = random.randint(1, max_days)
             assigned_operator = random.choice(valid_operators)
 
             # Calcula a quantidade de dias em atraso, se late_order > 0 = atraso.. 
             late_order = assigned_day - order_data["expected_start_day"]
 
             # Atualiza a solução para a OS atual
-            solution[order_id]["day"] = assigned_day
-            solution[order_id]["operator"] = assigned_operator
-            solution[order_id]["status"] = "atrasada" if late_order > 0 else "atendida"
+            solution["orders"][order_id]["day"] = assigned_day
+            solution["orders"][order_id]["operator"] = assigned_operator
+            solution["orders"][order_id]["status"] = "atrasada" if late_order > 0 else "atendida"
 
     return solution
 
 # Função para calcular a aptidão de uma solução 
-def calculate_fitness(solution, operators, orders):
+def calculate_fitness(solution, operators, orders, max_days):
     """
     Calcula a pontuação de aptidão de uma solução. A função avalia como uma solução de alocação de ordens a operadores
     é eficaz, levando em consideração a compatibilidade das habilidades, o cumprimento de prazo e o excesso de horas
@@ -200,11 +203,11 @@ def calculate_fitness(solution, operators, orders):
     fitness = 0  # Inicia a pontuação de aptidão com zero.
 
     # Dicionário para rastrear as horas trabalhadas por operador por dia.
-    operator_daily_hours = {op_id: {day: 0 for day in range(1, max(order["day"] for order in solution.values()) + 1)}
+    operator_daily_hours = {op_id: {day: 0 for day in range(1, max_days+1)}
                             for op_id in operators.keys()}
-
+    
     # Itera sobre cada ordem na solução.
-    for order_id, allocation in solution.items():
+    for order_id, allocation in solution["orders"].items():
         operator_id = allocation["operator"]
         day = allocation["day"]
         status = allocation["status"]
@@ -244,6 +247,7 @@ def calculate_fitness(solution, operators, orders):
             if excess_hours > 0:
                 fitness -= 5 * excess_hours  # Penaliza o excesso de horas trabalhadas.
 
+    solution["fitness"] = fitness
     return fitness  # Retorna a pontuação de aptidão final da solução.
 
 # Função para realizar o crossover entre dois pais, garantindo que cada ordem seja atribuída apenas uma vez
@@ -268,17 +272,18 @@ def crossover(parent1, parent2, operators, orders, max_days):
     - Se alguma ordem não for atribuída após o crossover, ela é atribuída aleatoriamente a um operador em um dia aleatório.
     """
     # Inicializa o filho com uma estrutura vazia.
-    child = {}
+    child = {"orders": {}, "fitness": 0}
     assigned_orders = set()  # Rastreia as ordens já atribuídas.
 
     # Obtém a lista de ordens para o ponto de crossover.
-    order_ids = list(parent1.keys())
-    crossover_point = random.randint(1, len(order_ids) - 1)
+    orders_parent1 = list(parent1["orders"].keys())
+    orders_parent2 = list(parent2["orders"].keys())
+    crossover_point = random.randint(1, len(orders_parent1) - 1)
 
     # Primeiro segmento: Copia as ordens do pai 1 até o ponto de crossover.
-    for order_id in order_ids[:crossover_point]:
-        if order_id in parent1:
-            order_data = parent1[order_id]
+    for order_id in orders_parent1[:crossover_point]:
+        if order_id in parent1["orders"]:
+            order_data = parent1["orders"][order_id]
             operator = order_data["operator"]
             day = order_data["day"]
             status = order_data["status"]
@@ -287,13 +292,13 @@ def crossover(parent1, parent2, operators, orders, max_days):
             if (order_id not in assigned_orders
                 and meets_minimum_skills(operators[operator]["skills"], orders[order_id]["required_skills"])
                 ):
-                child[order_id] = {"operator": operator, "day": day, "status": status}
+                child["orders"][order_id] = {"operator": operator, "day": day, "status": status}
                 assigned_orders.add(order_id)
 
     # Segundo segmento: Copia as ordens do pai 2 após o ponto de crossover.
-    for order_id in order_ids[crossover_point:]:
-        if order_id in parent2:
-            order_data = parent2[order_id]
+    for order_id in orders_parent2[crossover_point:]:
+        if order_id in parent2["orders"]:
+            order_data = parent2["orders"][order_id]
             operator = order_data["operator"]
             day = order_data["day"]
             status = order_data["status"]
@@ -302,21 +307,28 @@ def crossover(parent1, parent2, operators, orders, max_days):
             if (order_id not in assigned_orders
                 and meets_minimum_skills(operators[operator]["skills"], orders[order_id]["required_skills"])
             ):
-                child[order_id] = {"operator": operator, "day": day, "status": status}
+                child["orders"][order_id] = {"operator": operator, "day": day, "status": status}
                 assigned_orders.add(order_id)
 
-    # Atribui ordens "não atribuídas" aleatoriamente.
+    # Atribui ordens "não atribuídas", aleatoriamente.
     for order_id in orders.keys():
         if order_id not in assigned_orders:
             random_operator = random.choice(list(operators.keys()))
             random_day = random.randint(1, max_days)
+            
+            # Calcula a quantidade de dias em atraso, se late_order > 0 = atraso.. 
+            late_order = random_day - order_data["expected_start_day"]
+            new_status = "atrasada" if late_order > 0 else "atendida"
 
-            # Garante que o operador é compatível
+            # Garante que o operador é compatível.
             while not meets_minimum_skills(operators[random_operator]["skills"], orders[order_id]["required_skills"]):
                 random_operator = random.choice(list(operators.keys()))
 
-            child[order_id] = {"operator": random_operator, "day": random_day, "status": "não atendida"}
+            child["orders"][order_id] = {"operator": random_operator, "day": random_day, "status": new_status}
             assigned_orders.add(order_id)
+
+    # Recalcula o fitness para o novo individuo sendo criado.
+    child["fitness"] = calculate_fitness(child, operators, orders, max_days)
 
     return child
 
@@ -342,8 +354,14 @@ def mutate(solution, operators, orders, mutation_rate, max_days):
     # Faz uma cópia profunda da solução para evitar alterações na original.
     mutated = copy.deepcopy(solution)
 
+    # Garantir que o fitness original esteja definido.
+    original_fitness = solution["fitness"]
+    if original_fitness is None:
+        raise ValueError("O fitness original não pode ser None. Verifique a função de cálculo de aptidão.")
+
+
     # Aplica mutações em ordens individuais com base na taxa de mutação.
-    for order_id, allocation in solution.items():
+    for order_id, allocation in solution["orders"].items():
         if random.random() < mutation_rate:
             current_day = allocation["day"]
             current_operator = allocation["operator"]
@@ -357,22 +375,28 @@ def mutate(solution, operators, orders, mutation_rate, max_days):
             # Verifica se o novo operador atende às habilidades necessárias para a ordem.
             if meets_minimum_skills(operators[new_operator]["skills"], orders[order_id]["required_skills"]):
                 # Atualiza temporariamente a alocação para o novo operador e dia.
-                mutated[order_id] = {"day": new_day, "operator": new_operator, "status": None}
+                mutated["orders"][order_id] = {"day": new_day, "operator": new_operator, "status": None}
 
                 # Atualiza o status da ordem.
-                mutated[order_id]["status"] = "atendida" if new_day <= expected_start_day else "atrasada"
+                mutated["orders"][order_id]["status"] = "atendida" if new_day <= expected_start_day else "atrasada"
                 
                 # Calcula a aptidão antes e depois da mutação.
-                original_fitness = calculate_fitness(solution, operators, orders)
-                new_fitness = calculate_fitness(mutated, operators, orders)
+                new_fitness = calculate_fitness(mutated, operators, orders, max_days)
+
+                # Garantir que `new_fitness` seja válido.
+                if new_fitness is None:
+                    raise ValueError("O cálculo de aptidão retornou None. Verifique a função de cálculo de aptidão.")
 
                 # Se a mutação não melhorar a aptidão, desfaz a alteração.
                 if new_fitness < original_fitness:
-                    mutated[order_id] = {
+                    mutated["orders"][order_id] = {
                         "day": current_day, 
                         "operator": current_operator, 
                         "status": current_status
                         }
+                else:
+                    # Atualiza o fitness da solução mutada.
+                    mutated["fitness"] = new_fitness    
                     
     return mutated
 
@@ -446,7 +470,7 @@ def solution_to_dataframe(solution, operators, orders):
     data = []
     operator_daily_hours = {}
 
-    for order_id, allocation in solution.items():
+    for order_id, allocation in solution["orders"].items():
         day = allocation["day"]
         operator_id = allocation["operator"]
         current_status = allocation["status"]

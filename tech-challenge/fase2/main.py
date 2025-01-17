@@ -22,14 +22,14 @@ pygame.display.set_caption("Loop de Gerações")
 clock = pygame.time.Clock()
 
 # =========== VARs GLOBAIS ===========
-FPS = 20    # Velocidade de atualizaçao dos frames do PyGame.
+FPS = 10    # Velocidade de atualizaçao dos frames do PyGame.
 cor_fundo = [204, 204, 204]
 
 params = {
-    "_N_ORDERS" : 81,
+    "_N_ORDERS" : 100,
     "_N_OPERATORS" : 15,
     "_POPULATION_SIZE" : 50,
-    "_GENERATIONS" : 50,
+    "_GENERATIONS" : 100,
     "_MUTATION_RATE" : 0.3,
     "_ELITISM_SIZE" : 5,
     "_REINITIALIZE_INTERVAL" : 10,
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     # Contador para imprimir FPS a cada 20 quadros
     fps_counter = 0
-    fps_print_interval = 20
+    fps_print_interval = 10
         
     # Main game loop
     running = True
@@ -93,11 +93,11 @@ if __name__ == '__main__':
             
             # population = sorted(population, key=calculate_fitness).
             population = sorted(population, reverse=True, key=lambda individual: 
-                                algorithms[selected_algorithm].calculate_fitness(individual, operators, orders))
-
+                                algorithms[selected_algorithm].calculate_fitness(individual, operators, orders, params["_DAYS"]))
+            
             # Exibição da aptidão da melhor solução da geração.
-            best_fitness = algorithms[selected_algorithm].calculate_fitness(population[0], operators, orders)
-            best_schedule = population[0]
+            best_fitness = population[0]["fitness"]
+            best_schedule = population[0] 
             best_fitness_values.append(best_fitness)
             best_schedules.append(best_schedule)
             
@@ -116,12 +116,15 @@ if __name__ == '__main__':
                 new_population[-num_to_reinitialize:] = [
                     algorithms[selected_algorithm].create_initial_solution(operators, orders, params["_DAYS"]) 
                     for _ in range(num_to_reinitialize)]
+                
+                # Recalcula o fitness da nova populaçao
+                for individual in new_population[-num_to_reinitialize:]:
+                    individual["fitness"] = algorithms[selected_algorithm].calculate_fitness(individual, operators, orders, params["_DAYS"])
 
             population = new_population
 
-            # Após as gerações, mostra a melhor solução.
-            best_solution = max(best_schedules, key=lambda solution: 
-                                algorithms[selected_algorithm].calculate_fitness(solution, operators, orders))
+            # Encontrando a melhor solução com base no fitness
+            best_solution = max(best_schedules, key=lambda individual: individual["fitness"])
             
             # Desenha as informações na tela.
             pgf.draw_plot(screen, list(range(len(best_fitness_values))), best_fitness_values, window_size)
@@ -130,13 +133,6 @@ if __name__ == '__main__':
             
             # Atualiza a tela.
             pygame.display.flip()
-
-            # Imprime FPS a cada 20 quadros
-            fps_counter += 1
-            if fps_counter % fps_print_interval == 0:
-                fps = clock.get_fps()
-                print(f"FPS: {fps:.2f}")
-            
             # Controla o FPS do jogo
             clock.tick(FPS) 
             

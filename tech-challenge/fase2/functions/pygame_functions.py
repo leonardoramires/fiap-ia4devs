@@ -97,7 +97,7 @@ def draw_squares(screen, population, orders, n_orders, window_size=(1000, 600)):
             order_index = row * n_columns + col
             if order_index < total_orders:
                 order_id = order_ids[order_index]
-                order = population[order_id]
+                order = population["orders"][order_id]
                 
                 # Determina o operador.
                 operator_id = order["operator"]
@@ -113,9 +113,6 @@ def draw_squares(screen, population, orders, n_orders, window_size=(1000, 600)):
             else:
                 # Caso não haja ordem correspondente .
                 color = (0, 0, 26)  # Azul Petroleto para erro de referência.
-
-            # # Desenha o quadrado.
-            # pygame.draw.rect(screen, color, (x, y, square_size, square_size))
 
             # Cria a superfície para o quadrado.
             square_surface = pygame.Surface((square_size, square_size))
