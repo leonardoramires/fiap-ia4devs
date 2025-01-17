@@ -99,11 +99,12 @@ if __name__ == '__main__':
         Args:   "genetic_algorithm"
                 "linear_programming_algorithm"
                 "greedy_algorithm"
+                "human_allocation"
     """
     # parser para escolha do algoritmo
     algorithm_keys = list(algorithms.keys())
     parser = argparse.ArgumentParser(description="Escolha o algoritmo de alocação a ser utilizado.")
-    parser.add_argument('--algorithm', choices=algorithm_keys, help="Algoritmo de alocação a ser utilizado: 'linear', 'greedy' ou 'genetic'")
+    parser.add_argument('--algorithm', choices=algorithm_keys, help="Algoritmo de alocação a ser utilizado: 'genetic_algorithm', 'greedy_algorithm', 'linear_programming_algorithm' ou 'human_allocation'")
     args = parser.parse_args()
 
     # Escolha do algoritmo
