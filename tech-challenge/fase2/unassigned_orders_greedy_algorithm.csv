@@ -1,101 +1,101 @@
 order_id,required_skills,estimated_hours,priority,expected_start_day
-ordem1,alvenaria | solda,6,alta,4
-ordem2,alvenaria,2,urgente,2
-ordem3,hidráulica | solda,3,baixa,2
-ordem4,pintura,4,baixa,5
-ordem5,pintura | elétrica,8,baixa,2
-ordem6,pintura | alvenaria,6,urgente,1
-ordem7,alvenaria | hidráulica,5,baixa,4
-ordem8,alvenaria,8,urgente,4
-ordem9,pintura,4,média,5
-ordem10,solda,4,baixa,4
-ordem11,pintura,4,alta,2
-ordem12,hidráulica | pintura,4,média,4
-ordem13,pintura | hidráulica,3,alta,1
-ordem14,elétrica | solda,7,baixa,3
-ordem15,pintura | solda,3,baixa,2
-ordem16,alvenaria | elétrica,5,urgente,3
-ordem17,elétrica,4,alta,2
-ordem18,alvenaria | hidráulica,5,alta,1
-ordem19,elétrica,3,média,1
-ordem20,alvenaria,5,baixa,5
-ordem21,solda | elétrica,5,média,1
-ordem22,hidráulica | elétrica,8,alta,1
-ordem23,hidráulica | solda,3,baixa,2
-ordem24,hidráulica | solda,5,média,4
-ordem25,hidráulica | pintura,6,urgente,4
-ordem26,elétrica | hidráulica,8,média,2
-ordem27,alvenaria,8,urgente,4
-ordem28,solda,5,baixa,4
-ordem29,alvenaria,2,média,1
-ordem30,elétrica | hidráulica,8,alta,3
-ordem31,solda,3,baixa,1
-ordem32,hidráulica,6,média,4
-ordem33,elétrica,6,média,3
-ordem34,solda,8,urgente,2
-ordem35,solda,8,média,5
-ordem36,hidráulica | elétrica,5,média,5
-ordem37,pintura | alvenaria,4,baixa,2
-ordem38,alvenaria | elétrica,2,média,4
-ordem39,hidráulica,8,alta,1
-ordem40,solda | elétrica,2,baixa,1
-ordem41,elétrica | hidráulica,2,urgente,1
-ordem42,solda | pintura,6,baixa,1
-ordem43,elétrica,8,alta,3
-ordem44,alvenaria,6,alta,2
-ordem45,alvenaria | elétrica,6,urgente,2
-ordem46,elétrica,6,alta,2
-ordem47,solda | alvenaria,6,média,1
-ordem48,alvenaria,2,média,5
-ordem49,pintura,2,baixa,1
-ordem50,hidráulica,2,média,5
-ordem51,elétrica | pintura,3,alta,5
-ordem52,pintura | solda,5,média,1
-ordem53,hidráulica | elétrica,6,baixa,5
-ordem54,elétrica,8,alta,3
-ordem55,solda | elétrica,8,média,2
-ordem56,alvenaria | solda,5,baixa,1
-ordem57,solda | elétrica,2,baixa,3
-ordem58,pintura | hidráulica,7,média,5
-ordem59,solda,5,alta,3
-ordem60,pintura | hidráulica,4,média,1
-ordem61,hidráulica,7,alta,1
-ordem62,alvenaria | pintura,5,baixa,2
-ordem63,pintura | alvenaria,4,urgente,2
-ordem64,alvenaria,8,média,2
-ordem65,elétrica | solda,6,média,3
-ordem66,elétrica | solda,5,urgente,3
-ordem67,hidráulica,4,média,4
-ordem68,solda,3,alta,2
-ordem69,alvenaria,6,média,5
-ordem70,solda | pintura,4,urgente,5
-ordem71,alvenaria | hidráulica,5,urgente,1
-ordem72,elétrica | solda,8,alta,4
-ordem73,hidráulica,7,alta,1
-ordem74,hidráulica | alvenaria,3,média,3
-ordem75,solda,6,média,1
-ordem76,elétrica | hidráulica,7,urgente,3
-ordem77,solda | pintura,3,baixa,3
-ordem78,solda,2,média,2
-ordem79,elétrica,4,baixa,5
-ordem80,alvenaria,5,baixa,4
-ordem81,pintura,3,alta,3
-ordem82,hidráulica,3,média,4
-ordem83,elétrica | hidráulica,3,média,3
-ordem84,solda | pintura,6,baixa,2
-ordem85,alvenaria,6,urgente,5
-ordem86,solda,7,alta,2
-ordem87,alvenaria,6,média,1
-ordem88,solda | hidráulica,3,baixa,4
-ordem89,pintura | solda,8,média,1
-ordem90,pintura | solda,5,urgente,1
-ordem91,alvenaria | hidráulica,3,alta,2
-ordem92,pintura,7,urgente,3
-ordem93,alvenaria | pintura,8,alta,4
-ordem94,alvenaria,7,baixa,4
-ordem95,hidráulica | elétrica,4,baixa,3
-ordem96,solda | elétrica,6,baixa,5
-ordem97,elétrica,3,urgente,4
-ordem98,solda | pintura,6,baixa,5
-ordem99,alvenaria | pintura,8,alta,3
-ordem100,solda | pintura,8,baixa,3
+ordem1,pintura,7,alta,4
+ordem2,solda,7,média,3
+ordem3,solda,4,média,1
+ordem4,pintura,6,média,2
+ordem5,elétrica | alvenaria,2,alta,3
+ordem6,elétrica,7,média,4
+ordem7,pintura,8,média,3
+ordem8,hidráulica,3,baixa,2
+ordem9,solda,3,baixa,4
+ordem10,hidráulica,7,média,2
+ordem11,pintura,6,alta,4
+ordem12,alvenaria | elétrica,7,média,1
+ordem13,alvenaria | solda,5,alta,3
+ordem14,pintura | alvenaria,4,urgente,2
+ordem15,hidráulica | elétrica,8,urgente,4
+ordem16,pintura,7,urgente,4
+ordem17,pintura | alvenaria,3,alta,2
+ordem18,hidráulica,3,média,5
+ordem19,hidráulica | elétrica,6,média,5
+ordem20,elétrica | solda,7,baixa,5
+ordem21,hidráulica | alvenaria,7,urgente,4
+ordem22,pintura | solda,7,média,3
+ordem23,alvenaria,4,média,1
+ordem24,pintura,2,urgente,1
+ordem25,alvenaria,5,média,1
+ordem26,elétrica | solda,3,alta,3
+ordem27,hidráulica,5,baixa,5
+ordem28,elétrica | alvenaria,8,urgente,3
+ordem29,alvenaria | elétrica,7,urgente,1
+ordem30,pintura | solda,5,urgente,2
+ordem31,alvenaria,3,média,2
+ordem32,alvenaria,3,alta,4
+ordem33,elétrica | pintura,8,média,3
+ordem34,elétrica | pintura,2,média,4
+ordem35,solda | hidráulica,8,urgente,5
+ordem36,alvenaria | solda,5,alta,4
+ordem37,elétrica,6,urgente,3
+ordem38,pintura | solda,7,alta,3
+ordem39,pintura,3,alta,3
+ordem40,elétrica,5,urgente,5
+ordem41,elétrica | hidráulica,8,alta,5
+ordem42,hidráulica | pintura,2,alta,2
+ordem43,alvenaria,2,urgente,2
+ordem44,hidráulica,4,média,4
+ordem45,pintura,4,baixa,3
+ordem46,pintura,7,média,2
+ordem47,hidráulica | solda,6,alta,1
+ordem48,pintura | elétrica,4,baixa,2
+ordem49,hidráulica | alvenaria,6,média,3
+ordem50,alvenaria | solda,7,urgente,1
+ordem51,solda,3,urgente,5
+ordem52,pintura | hidráulica,4,alta,1
+ordem53,alvenaria | solda,7,baixa,3
+ordem54,solda | elétrica,7,média,5
+ordem55,solda,5,urgente,1
+ordem56,solda | alvenaria,4,urgente,4
+ordem57,elétrica | solda,8,urgente,2
+ordem58,pintura | alvenaria,5,baixa,3
+ordem59,elétrica,3,baixa,2
+ordem60,hidráulica | solda,4,urgente,4
+ordem61,pintura | solda,8,baixa,5
+ordem62,solda | elétrica,8,média,1
+ordem63,solda,5,alta,5
+ordem64,pintura,2,urgente,2
+ordem65,pintura,2,alta,5
+ordem66,elétrica,8,urgente,2
+ordem67,pintura,8,urgente,4
+ordem68,elétrica,3,urgente,2
+ordem69,pintura,3,média,3
+ordem70,pintura | solda,4,baixa,5
+ordem71,hidráulica | alvenaria,2,alta,3
+ordem72,alvenaria | pintura,6,alta,1
+ordem73,solda,5,média,3
+ordem74,pintura,2,urgente,3
+ordem75,alvenaria | elétrica,5,alta,3
+ordem76,hidráulica,7,alta,4
+ordem77,solda | hidráulica,4,urgente,1
+ordem78,elétrica,6,urgente,3
+ordem79,pintura,8,alta,4
+ordem80,hidráulica,2,baixa,1
+ordem81,elétrica | hidráulica,7,alta,3
+ordem82,alvenaria | solda,4,baixa,5
+ordem83,solda | elétrica,6,alta,2
+ordem84,pintura | alvenaria,2,urgente,5
+ordem85,alvenaria | hidráulica,7,baixa,1
+ordem86,elétrica | pintura,5,média,1
+ordem87,alvenaria | solda,8,baixa,1
+ordem88,pintura,2,alta,1
+ordem89,hidráulica | pintura,4,média,1
+ordem90,elétrica,7,alta,3
+ordem91,elétrica,7,baixa,3
+ordem92,pintura | elétrica,2,alta,4
+ordem93,hidráulica,5,alta,5
+ordem94,solda,6,baixa,1
+ordem95,elétrica,4,urgente,3
+ordem96,pintura | hidráulica,2,baixa,4
+ordem97,elétrica | solda,6,média,4
+ordem98,alvenaria | elétrica,4,baixa,3
+ordem99,pintura,4,urgente,1
+ordem100,pintura | hidráulica,2,baixa,4

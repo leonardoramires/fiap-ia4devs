@@ -1,0 +1,76 @@
+dia,id_operador,id_ordem,habilidades_ordem,habilidades_operador,nivel_operador,horas_estimadas,horas_disponiveis,prioridade,inicio_esperado,atraso,compatibilidade_habilidade,habilidades_nao_atendidas,compatibilidade_nivel_prioridade,hora_extra,total_hora_extra,status
+1,op1,ordem29,alvenaria | elétrica,solda | elétrica | hidráulica,júnior,7,7,urgente,1,0,50.0,alvenaria,NOK,Não,0,não_atendida
+1,op2,ordem50,alvenaria | solda,solda | elétrica | hidráulica,sênior,7,8,urgente,1,0,50.0,alvenaria,OK,Não,0,não_atendida
+1,op3,ordem14,pintura | alvenaria,elétrica | alvenaria,júnior,4,9,urgente,2,-1,50.0,pintura,NOK,Não,0,não_atendida
+1,op3,ordem43,alvenaria,elétrica | alvenaria,júnior,2,9,urgente,2,-1,100.0,,NOK,Não,0,não_atendida
+1,op3,ordem68,elétrica,elétrica | alvenaria,júnior,3,9,urgente,2,-1,100.0,,NOK,Não,0,não_atendida
+1,op4,ordem24,pintura,pintura | elétrica,sênior,2,7,urgente,1,0,100.0,,OK,Não,0,não_atendida
+1,op4,ordem99,pintura,pintura | elétrica,sênior,4,7,urgente,1,0,100.0,,OK,Não,0,não_atendida
+1,op5,ordem55,solda,hidráulica | solda,sênior,5,7,urgente,1,0,100.0,,OK,Não,0,não_atendida
+1,op5,ordem42,hidráulica | pintura,hidráulica | solda,sênior,2,7,alta,2,-1,50.0,pintura,OK,Não,0,não_atendida
+1,op6,ordem77,solda | hidráulica,hidráulica | solda,júnior,4,7,urgente,1,0,100.0,,NOK,Não,0,não_atendida
+1,op6,ordem51,solda,hidráulica | solda,júnior,3,7,urgente,5,-4,100.0,,NOK,Não,0,não_atendida
+1,op7,ordem30,pintura | solda,solda | elétrica | hidráulica,pleno,5,7,urgente,2,-1,50.0,pintura,NOK,Não,0,não_atendida
+1,op7,ordem5,elétrica | alvenaria,solda | elétrica | hidráulica,pleno,2,7,alta,3,-2,50.0,alvenaria,NOK,Não,0,não_atendida
+1,op8,ordem57,elétrica | solda,solda | alvenaria,pleno,8,9,urgente,2,-1,50.0,elétrica,NOK,Não,0,não_atendida
+1,op9,ordem64,pintura,alvenaria | elétrica | pintura,especialista,2,8,urgente,2,-1,100.0,,OK,Não,0,não_atendida
+1,op9,ordem37,elétrica,alvenaria | elétrica | pintura,especialista,6,8,urgente,3,-2,100.0,,OK,Não,0,não_atendida
+1,op10,ordem66,elétrica,elétrica | solda,júnior,8,8,urgente,2,-1,100.0,,NOK,Não,0,não_atendida
+2,op1,ordem78,elétrica,solda | elétrica | hidráulica,júnior,6,7,urgente,3,-1,100.0,,NOK,Não,0,não_atendida
+2,op2,ordem28,elétrica | alvenaria,solda | elétrica | hidráulica,sênior,8,8,urgente,3,-1,50.0,alvenaria,OK,Não,0,não_atendida
+2,op3,ordem95,elétrica,elétrica | alvenaria,júnior,4,9,urgente,3,-1,100.0,,NOK,Não,0,não_atendida
+2,op3,ordem56,solda | alvenaria,elétrica | alvenaria,júnior,4,9,urgente,4,-2,50.0,solda,NOK,Não,0,não_atendida
+2,op4,ordem74,pintura,pintura | elétrica,sênior,2,7,urgente,3,-1,100.0,,OK,Não,0,não_atendida
+2,op4,ordem40,elétrica,pintura | elétrica,sênior,5,7,urgente,5,-3,100.0,,OK,Não,0,não_atendida
+2,op5,ordem21,hidráulica | alvenaria,hidráulica | solda,sênior,7,7,urgente,4,-2,50.0,alvenaria,OK,Não,0,não_atendida
+2,op6,ordem60,hidráulica | solda,hidráulica | solda,júnior,4,7,urgente,4,-2,100.0,,NOK,Não,0,não_atendida
+2,op6,ordem26,elétrica | solda,hidráulica | solda,júnior,3,7,alta,3,-1,50.0,elétrica,NOK,Não,0,não_atendida
+2,op7,ordem47,hidráulica | solda,solda | elétrica | hidráulica,pleno,6,7,alta,1,1,100.0,,NOK,Não,0,não_atendida
+2,op8,ordem35,solda | hidráulica,solda | alvenaria,pleno,8,9,urgente,5,-3,50.0,hidráulica,NOK,Não,0,não_atendida
+2,op9,ordem15,hidráulica | elétrica,alvenaria | elétrica | pintura,especialista,8,8,urgente,4,-2,50.0,hidráulica,OK,Não,0,não_atendida
+2,op10,ordem83,solda | elétrica,elétrica | solda,júnior,6,8,alta,2,0,100.0,,NOK,Não,0,não_atendida
+2,op10,ordem92,pintura | elétrica,elétrica | solda,júnior,2,8,alta,4,-2,50.0,pintura,NOK,Não,0,não_atendida
+3,op1,ordem52,pintura | hidráulica,solda | elétrica | hidráulica,júnior,4,7,alta,1,2,50.0,pintura,NOK,Não,0,não_atendida
+3,op1,ordem71,hidráulica | alvenaria,solda | elétrica | hidráulica,júnior,2,7,alta,3,0,50.0,alvenaria,NOK,Não,0,não_atendida
+3,op2,ordem13,alvenaria | solda,solda | elétrica | hidráulica,sênior,5,8,alta,3,0,50.0,alvenaria,OK,Não,0,não_atendida
+3,op2,ordem34,elétrica | pintura,solda | elétrica | hidráulica,sênior,2,8,média,4,-1,50.0,pintura,OK,Não,0,não_atendida
+3,op3,ordem84,pintura | alvenaria,elétrica | alvenaria,júnior,2,9,urgente,5,-2,50.0,pintura,NOK,Não,0,não_atendida
+3,op3,ordem72,alvenaria | pintura,elétrica | alvenaria,júnior,6,9,alta,1,2,50.0,pintura,NOK,Não,0,não_atendida
+3,op4,ordem16,pintura,pintura | elétrica,sênior,7,7,urgente,4,-1,100.0,,OK,Não,0,não_atendida
+3,op5,ordem38,pintura | solda,hidráulica | solda,sênior,7,7,alta,3,0,50.0,pintura,OK,Não,0,não_atendida
+3,op6,ordem81,elétrica | hidráulica,hidráulica | solda,júnior,7,7,alta,3,0,50.0,elétrica,NOK,Não,0,não_atendida
+3,op7,ordem75,alvenaria | elétrica,solda | elétrica | hidráulica,pleno,5,7,alta,3,0,50.0,alvenaria,NOK,Não,0,não_atendida
+3,op7,ordem80,hidráulica,solda | elétrica | hidráulica,pleno,2,7,baixa,1,2,100.0,,OK,Não,0,não_atendida
+3,op8,ordem17,pintura | alvenaria,solda | alvenaria,pleno,3,9,alta,2,1,50.0,pintura,NOK,Não,0,não_atendida
+3,op8,ordem32,alvenaria,solda | alvenaria,pleno,3,9,alta,4,-1,100.0,,NOK,Não,0,não_atendida
+3,op8,ordem31,alvenaria,solda | alvenaria,pleno,3,9,média,2,1,100.0,,OK,Não,0,não_atendida
+3,op9,ordem67,pintura,alvenaria | elétrica | pintura,especialista,8,8,urgente,4,-1,100.0,,OK,Não,0,não_atendida
+3,op10,ordem90,elétrica,elétrica | solda,júnior,7,8,alta,3,0,100.0,,NOK,Não,0,não_atendida
+4,op1,ordem36,alvenaria | solda,solda | elétrica | hidráulica,júnior,5,7,alta,4,0,50.0,alvenaria,NOK,Não,0,não_atendida
+4,op1,ordem96,pintura | hidráulica,solda | elétrica | hidráulica,júnior,2,7,baixa,4,0,50.0,pintura,OK,Não,0,não_atendida
+4,op2,ordem76,hidráulica,solda | elétrica | hidráulica,sênior,7,8,alta,4,0,100.0,,OK,Não,0,não_atendida
+4,op3,ordem41,elétrica | hidráulica,elétrica | alvenaria,júnior,8,9,alta,5,-1,50.0,hidráulica,NOK,Não,0,não_atendida
+4,op4,ordem88,pintura,pintura | elétrica,sênior,2,7,alta,1,3,100.0,,OK,Não,0,não_atendida
+4,op4,ordem39,pintura,pintura | elétrica,sênior,3,7,alta,3,1,100.0,,OK,Não,0,não_atendida
+4,op4,ordem65,pintura,pintura | elétrica,sênior,2,7,alta,5,-1,100.0,,OK,Não,0,não_atendida
+4,op5,ordem63,solda,hidráulica | solda,sênior,5,7,alta,5,-1,100.0,,OK,Não,0,não_atendida
+4,op5,ordem100,pintura | hidráulica,hidráulica | solda,sênior,2,7,baixa,4,0,50.0,pintura,OK,Não,0,não_atendida
+4,op6,ordem93,hidráulica,hidráulica | solda,júnior,5,7,alta,5,-1,100.0,,NOK,Não,0,não_atendida
+4,op7,ordem3,solda,solda | elétrica | hidráulica,pleno,4,7,média,1,3,100.0,,OK,Não,0,não_atendida
+4,op7,ordem18,hidráulica,solda | elétrica | hidráulica,pleno,3,7,média,5,-1,100.0,,OK,Não,0,não_atendida
+4,op8,ordem12,alvenaria | elétrica,solda | alvenaria,pleno,7,9,média,1,3,50.0,elétrica,OK,Não,0,não_atendida
+4,op9,ordem1,pintura,alvenaria | elétrica | pintura,especialista,7,8,alta,4,0,100.0,,OK,Não,0,não_atendida
+4,op10,ordem62,solda | elétrica,elétrica | solda,júnior,8,8,média,1,3,100.0,,NOK,Não,0,não_atendida
+5,op1,ordem86,elétrica | pintura,solda | elétrica | hidráulica,júnior,5,7,média,1,4,50.0,pintura,NOK,Não,0,não_atendida
+5,op2,ordem89,hidráulica | pintura,solda | elétrica | hidráulica,sênior,4,8,média,1,4,50.0,pintura,OK,Não,0,não_atendida
+5,op2,ordem44,hidráulica,solda | elétrica | hidráulica,sênior,4,8,média,4,1,100.0,,OK,Não,0,não_atendida
+5,op3,ordem23,alvenaria,elétrica | alvenaria,júnior,4,9,média,1,4,100.0,,NOK,Não,0,não_atendida
+5,op3,ordem25,alvenaria,elétrica | alvenaria,júnior,5,9,média,1,4,100.0,,NOK,Não,0,não_atendida
+5,op4,ordem11,pintura,pintura | elétrica,sênior,6,7,alta,4,1,100.0,,OK,Não,0,não_atendida
+5,op5,ordem10,hidráulica,hidráulica | solda,sênior,7,7,média,2,3,100.0,,OK,Não,0,não_atendida
+5,op6,ordem2,solda,hidráulica | solda,júnior,7,7,média,3,2,100.0,,NOK,Não,0,não_atendida
+5,op7,ordem22,pintura | solda,solda | elétrica | hidráulica,pleno,7,7,média,3,2,50.0,pintura,OK,Não,0,não_atendida
+5,op8,ordem49,hidráulica | alvenaria,solda | alvenaria,pleno,6,9,média,3,2,50.0,hidráulica,OK,Não,0,não_atendida
+5,op8,ordem9,solda,solda | alvenaria,pleno,3,9,baixa,4,1,100.0,,OK,Não,0,não_atendida
+5,op9,ordem79,pintura,alvenaria | elétrica | pintura,especialista,8,8,alta,4,1,100.0,,OK,Não,0,não_atendida
+5,op10,ordem33,elétrica | pintura,elétrica | solda,júnior,8,8,média,3,2,50.0,pintura,NOK,Não,0,não_atendida

@@ -52,7 +52,7 @@ def run_greedy_algorithm(_N_ORDERS, _N_OPERATORS):
         orders_df = cf.orders_to_dataframe(orders)
         print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    solution_df.to_csv("resultado_greedy_algorithm.csv", index=False)
+    solution_df.to_csv("result_greedy_algorithm.csv", index=False)
     orders_df.to_csv("unassigned_orders_greedy_algorithm.csv", index=False)
     print("\n")
 
@@ -67,7 +67,7 @@ def run_linear_algorithm(_N_ORDERS, _N_OPERATORS):
         orders_df = cf.orders_to_dataframe(orders)
         print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    solution_df.to_csv("resultado_linear_programming.csv", index=False)
+    solution_df.to_csv("result_linear_programming.csv", index=False)
     orders_df.to_csv("unassigned_orders_linear_programming.csv", index=False)
     print("\n")
 
@@ -82,7 +82,7 @@ def run_human_allocation(_N_ORDERS, _N_OPERATORS):
         orders_df = cf.orders_to_dataframe(orders)
         print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    solution_df.to_csv("resultado_human_allocation.csv", index=False)
+    solution_df.to_csv("result_human_allocation.csv", index=False)
     orders_df.to_csv("unassigned_orders_humman_allocation.csv", index=False)
     print("\n")
 
