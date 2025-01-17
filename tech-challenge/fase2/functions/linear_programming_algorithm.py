@@ -1,6 +1,5 @@
-import pandas as pd
 import pulp
-import functions as F
+from .common_functions import *
 
 def linear_programming_allocation(operators, orders, days=5):
     """
@@ -21,7 +20,7 @@ def linear_programming_allocation(operators, orders, days=5):
     x = pulp.LpVariable.dicts("x", ((day, op, order) for day in range(days) for op in operators for order in orders), cat='Binary')
 
     # Função objetivo: maximizar a aptidão total
-    prob += pulp.lpSum(F.priority_to_number(orders[order]["priority"]) * x[day, op, order] for day in range(days) for op in operators for order in orders)
+    prob += pulp.lpSum(priority_to_number(orders[order]["priority"]) * x[day, op, order] for day in range(days) for op in operators for order in orders)
 
     # Restrição: cada ordem deve ser atribuída a exatamente um operador em um dia
     for order in orders:
@@ -31,7 +30,7 @@ def linear_programming_allocation(operators, orders, days=5):
     for day in range(days):
         for op in operators:
             for order in orders:
-                if not F.meets_minimum_skills(operators[op]["skills"], orders[order]["required_skills"]):
+                if not meets_minimum_skills(operators[op]["skills"], orders[order]["required_skills"]):
                     prob += x[day, op, order] == 0
 
     # Restrição: as horas de trabalho do operador não devem exceder as horas disponíveis

@@ -3,3 +3,4 @@ pygame
 pulp
 openpyxl
 seaborn
+matplotlib<3.10.0
