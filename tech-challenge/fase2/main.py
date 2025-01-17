@@ -46,13 +46,14 @@ def run_greedy_algorithm(_N_ORDERS, _N_OPERATORS):
     operators, orders = cf.create_sample_data(_N_ORDERS, _N_OPERATORS)
     solution = ga.greedy_allocation(operators, orders)
     greedy_fitness = cf.calculate_fitness(solution, operators, orders)
-    df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Greedy Algorithm):", greedy_fitness)
     if len(unassigned_orders) > 0:
         orders_df = cf.orders_to_dataframe(orders)
         print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    df.to_csv("resultado_greedy_programming.csv", index=False)
+    solution_df.to_csv("resultado_greedy_algorithm.csv", index=False)
+    orders_df.to_csv("unassigned_orders_greedy_algorithm.csv", index=False)
     print("\n")
 
 def run_linear_algorithm(_N_ORDERS, _N_OPERATORS):
@@ -60,13 +61,14 @@ def run_linear_algorithm(_N_ORDERS, _N_OPERATORS):
     operators, orders = cf.create_sample_data(_N_ORDERS, _N_OPERATORS)
     solution = lp.linear_programming_allocation(operators, orders)
     linear_fitness = cf.calculate_fitness(solution, operators, orders)
-    df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Linear Programming):", linear_fitness)
     if len(unassigned_orders) > 0:
         orders_df = cf.orders_to_dataframe(orders)
         print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    df.to_csv("resultado_linear_programming.csv", index=False)
+    solution_df.to_csv("resultado_linear_programming.csv", index=False)
+    orders_df.to_csv("unassigned_orders_linear_programming.csv", index=False)
     print("\n")
 
 def run_human_allocation(_N_ORDERS, _N_OPERATORS):
@@ -74,13 +76,14 @@ def run_human_allocation(_N_ORDERS, _N_OPERATORS):
     operators, orders = cf.create_sample_data(_N_ORDERS, _N_OPERATORS)
     solution = ha.human_allocation(operators, orders)
     linear_fitness = cf.calculate_fitness(solution, operators, orders)
-    df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Alocação Humana):", linear_fitness)
     if len(unassigned_orders) > 0:
         orders_df = cf.orders_to_dataframe(orders)
         print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
         print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    df.to_csv("resultado_human_allocation.csv", index=False)
+    solution_df.to_csv("resultado_human_allocation.csv", index=False)
+    orders_df.to_csv("unassigned_orders_humman_allocation.csv", index=False)
     print("\n")
 
 def run_comparison_algorithms():

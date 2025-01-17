@@ -24,7 +24,7 @@ def human_allocation(operators, orders, days=5):
         priority_groups[priority].append((order_id, order))
 
     # Ordena as prioridades (do mais alto para o mais baixo)
-    sorted_priorities = sorted(priority_groups.keys(), reverse=True)
+    sorted_priorities = sorted(priority_groups.keys(), key=priority_to_number, reverse=True)
 
     # Atribui cada ordem ao operador mais adequado disponível, por grupo de prioridade
     for priority in sorted_priorities:
