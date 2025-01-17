@@ -671,7 +671,7 @@ def salvar_arquivos(dataframe):
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Defina o diretório onde os arquivos serão salvos
-    result_dir = os.path.join(script_dir, "resultados")
+    result_dir = os.path.join(script_dir, "./../resultados")
 
     # Cria o diretório se não existir
     os.makedirs(result_dir, exist_ok=True)
