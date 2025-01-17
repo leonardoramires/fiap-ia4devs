@@ -448,15 +448,13 @@ def solution_to_dataframe(solution, operators, orders):
 
     for order_id, allocation in solution.items():
         day = allocation["day"]
-        operator_ids = allocation["operator"]
+        operator_id = allocation["operator"]
         current_status = allocation["status"]
 
         # Verifica se a ordem foi atribuída a algum operador.
-        if not operator_ids:
+        if not operator_id:
             operator_id = "N/A"
-            operator = {"skills": [], "level": "N/A", "hours_per_day": 0}
         else:
-            operator_id = operator_ids[0]  # Considera o primeiro operador da lista.
             operator = operators[operator_id]
 
         # Inicializa horas trabalhadas por operador no dia, se necessário.
@@ -639,7 +637,7 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
         'taxa_alocacao': (ordens_alocadas/total_ordens)*100,
         'matches_perfeitos': matches_perfeitos,
         'taxa_matches_perfeitos': (matches_perfeitos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
-        'compatibilidade_media': df['compatibilidade_habilidade'].mean()*100 if not df.empty else 0,
+        'compatibilidade_media': compatibilidade_media,
         'ordens_no_prazo': ordens_no_prazo,
         'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
     }
@@ -693,11 +691,11 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
     - O algoritmo utiliza a mutação, elitismo e re-inicialização periódica da população.
     """
     # Inicializa operadores e ordens iniciais.
-    operators, orders = create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"])
+    operators, orders = create_initial_data(orders, operators)
     
     # Gera populaçao inicial com base nos operadores e ordens iniciais.
-    population = [create_initial_solution(operators, orders, params["_DAYS"]) 
-                  for _ in range(params["_POPULATION_SIZE"])]
+    population = [create_initial_solution(operators, orders, days) 
+                  for _ in range(population_size)]
 
     # Salva os melhores fitness e geraçoes para plottar.
     best_fitness_values = []
@@ -722,18 +720,18 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
         
         # Geração da nova população.
         new_population = [population[0]]    # Preserva o melhor indivíduo (elitismo)
-        while len(new_population) < params["_POPULATION_SIZE"]:
-            parent1, parent2 = random.choices(population[:params["_ELITISM_SIZE"]], k=2)
-            child = crossover(parent1, parent2, operators, orders, params["_DAYS"])
-            child = mutate(child, operators, orders, params["_MUTATION_RATE"], params["_DAYS"])
+        while len(new_population) < population_size:
+            parent1, parent2 = random.choices(population[:elitism_size], k=2)
+            child = crossover(parent1, parent2, operators, orders, days)
+            child = mutate(child, operators, orders, mutation_rate, days)
             new_population.append(child)
 
         # Reinicialização da população a cada 'reinitalize_interval' gerações.
         # Esta função aumenta a variabilidade na população, trocando a metade da populaçao com menor fit.
-        if generation % params["_REINITIALIZE_INTERVAL"] == 0:
-            num_to_reinitialize = params["_POPULATION_SIZE"] // 2
+        if generation % reinitalize_interval == 0:
+            num_to_reinitialize = population_size // 2
             new_population[-num_to_reinitialize:] = [
-                create_initial_solution(operators, orders, params["_DAYS"]) 
+                create_initial_solution(operators, orders, days) 
                 for _ in range(num_to_reinitialize)]
 
         population = new_population
@@ -746,7 +744,7 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
 
     # Conversão dos dados da melhor solução encontrada em Dataframe.
     final_df, unassigned_orders = solution_to_dataframe(best_solution, operators, orders)
-    imprimir_resultados_alocacao(final_df, unassigned_orders, operators, orders)
+    imprimir_resultados_alocacao(final_df, unassigned_orders, orders)
     
     return final_df, unassigned_orders
  
@@ -763,7 +761,7 @@ if __name__ == '__main__':
         "_DAYS": 5,   # Dias a serem organizados pelo algoritmo.
     }
     best_solution_df, unassigned_orders = run_genetic_algorithm(params["_N_OPERATORS"], params["_N_ORDERS"], params["_POPULATION_SIZE"], params["_GENERATIONS"],
-                           params["_MUTATION_RATE"], params["_ELITISM_SIZE"], params["_REINITIALIZE_INTERVAL"],params["_DAYS"])
+                           params["_MUTATION_RATE"], params["_ELITISM_SIZE"], params["_REINITIALIZE_INTERVAL"], params["_DAYS"])
     
     # Salva os resultados em arquivo.
     salvar_arquivos(best_solution_df)

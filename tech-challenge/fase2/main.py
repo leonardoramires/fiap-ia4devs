@@ -26,9 +26,9 @@ FPS = 20    # Velocidade de atualizaçao dos frames do PyGame.
 cor_fundo = [204, 204, 204]
 
 params = {
-    "_N_ORDERS" : 100,
+    "_N_ORDERS" : 81,
     "_N_OPERATORS" : 15,
-    "_POPULATION_SIZE" : 100,
+    "_POPULATION_SIZE" : 50,
     "_GENERATIONS" : 50,
     "_MUTATION_RATE" : 0.3,
     "_ELITISM_SIZE" : 5,
@@ -65,6 +65,10 @@ if __name__ == '__main__':
     # Salva os melhores fitness e geraçoes para plottar.
     best_fitness_values = []
     best_schedules = []
+
+    # Contador para imprimir FPS a cada 20 quadros
+    fps_counter = 0
+    fps_print_interval = 20
         
     # Main game loop
     running = True
@@ -126,7 +130,15 @@ if __name__ == '__main__':
             
             # Atualiza a tela.
             pygame.display.flip()
-            clock.tick(FPS)
+
+            # Imprime FPS a cada 20 quadros
+            fps_counter += 1
+            if fps_counter % fps_print_interval == 0:
+                fps = clock.get_fps()
+                print(f"FPS: {fps:.2f}")
+            
+            # Controla o FPS do jogo
+            clock.tick(FPS) 
             
             # TODO IF todas as ordens forem alocadas ou BEST FITNESS
             # fazer tambem pelo numero de geraçoes em que nao teve melhora
@@ -151,9 +163,9 @@ if __name__ == '__main__':
 
                 # Salva os resultados em arquivo.
                 algorithms[selected_algorithm].salvar_arquivos(best_solution_df)
-                
+              
         if pause:
             pgf.draw_text(screen, "PAUSADO", screen.get_width() // 2, screen.get_height() // 2, font_size=30, font='Courier New')
 
-
+        
     pygame.quit()

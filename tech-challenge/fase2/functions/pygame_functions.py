@@ -61,13 +61,19 @@ def draw_squares(screen, population, orders, n_orders, window_size=(1000, 600)):
     """
     
     # Define o tamanho de cada quadrado e a distância entre os quadrados.
-    square_size = 30
+    square_size = 40
     distance_between_squares = 5
 
+    # Ajusta o tamanho da fonte para caber no quadrado
+    font_size = square_size // 2  # Tamanho da fonte é metade do tamanho do quadrado
+    font = pygame.font.Font(None, font_size)  # Cria a fonte com o tamanho ajustado
+    
     # Calcula o tamanho da matriz.
-    n = math.floor(n_orders ** 0.5)
-    matrix_width = n * (square_size + distance_between_squares) - distance_between_squares
-    matrix_height = n * (square_size + distance_between_squares) - distance_between_squares
+    
+    n_columns = math.floor(n_orders ** 0.5)
+    n_rows = math.ceil(n_orders / n_columns)
+    matrix_width = n_columns * (square_size + distance_between_squares) - distance_between_squares
+    matrix_height = n_columns * (square_size + distance_between_squares) - distance_between_squares
 
     # Calcula os deslocamentos para centralizar a matriz na metade direita da tela.
     x_offset = window_size[0] // 2  # Começa no meio da tela, à direita.
@@ -77,17 +83,18 @@ def draw_squares(screen, population, orders, n_orders, window_size=(1000, 600)):
     order_ids = list(orders.keys())  # Lista de IDs das ordens.
     total_orders = n_orders
 
-    # Fonte para desenhar o texto.
-    font = pygame.font.Font(None, 20)  # Fonte padrão com tamanho 20.
+
+    # Criar uma lista de superfícies para os quadrados.
+    square_surfaces = []
 
     # Desenha a matriz de quadrados.
-    for row in range(n):
-        for col in range(n):
+    for row in range(n_rows):
+        for col in range(n_columns):
             x = col * (square_size + distance_between_squares) + x_offset
             y = row * (square_size + distance_between_squares) + y_offset
             
             # Calcula o índice da ordem correspondente.
-            order_index = row * n + col
+            order_index = row * n_columns + col
             if order_index < total_orders:
                 order_id = order_ids[order_index]
                 order = population[order_id]
@@ -107,13 +114,26 @@ def draw_squares(screen, population, orders, n_orders, window_size=(1000, 600)):
                 # Caso não haja ordem correspondente .
                 color = (0, 0, 26)  # Azul Petroleto para erro de referência.
 
-            # Desenha o quadrado.
-            pygame.draw.rect(screen, color, (x, y, square_size, square_size)) 
+            # # Desenha o quadrado.
+            # pygame.draw.rect(screen, color, (x, y, square_size, square_size))
+
+            # Cria a superfície para o quadrado.
+            square_surface = pygame.Surface((square_size, square_size))
+            square_surface.fill(color) 
             
             # Renderiza o texto do operador.
             operator_text = font.render(str(operator), True, (0, 0, 0))  # Texto em preto.
-            text_rect = operator_text.get_rect(center=(x + square_size // 2, y + square_size // 2))  # Centraliza o texto
-            screen.blit(operator_text, text_rect)  
+            
+            # Verifica o texto gerado
+            text_rect = operator_text.get_rect(center=(square_size // 2, square_size // 2))  # Centraliza o texto
+            square_surface.blit(operator_text, text_rect)  
+
+            # Adiciona a superfície à lista.
+            square_surfaces.append((square_surface, x, y))
+
+    # Agora desenha todos os quadrados de uma vez.
+    for surface, x, y in square_surfaces:
+        screen.blit(surface, (x, y))
            
 # Função para renderizar texto na tela
 def draw_text(screen, text, x_position, y_position, color=(0, 0, 0), font_size=30, font='Arial'):
