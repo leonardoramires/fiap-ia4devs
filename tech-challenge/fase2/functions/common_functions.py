@@ -2,7 +2,7 @@ import random
 import pandas as pd
 
 # Função para criar os dados de exemplo
-def create_sample_data(n_orders=None, n_operators=None):
+def create_initial_data(n_orders=None, n_operators=None):
     """
     Inicializa dados simulados de operadores e ordens de serviço. Se 'n_operators' for fornecido, gera operadores e ordens automaticamente.
 
@@ -21,7 +21,7 @@ def create_sample_data(n_orders=None, n_operators=None):
     skills_level = ["júnior", "pleno", "sênior", "especialista"]
     priority_levels = ["baixa", "média", "alta", "urgente"]
 
-    # Geração automática de operadores, se n_operators for fornecido
+    # Geração automática de operadores, se n_operators for fornecido.
     if n_operators:
         operators = {}
         for i in range(1, n_operators + 1):
@@ -32,8 +32,9 @@ def create_sample_data(n_orders=None, n_operators=None):
             shift = random.choice(["manhã", "tarde", "noite"])
             hours_per_day = random.randint(7, 9)
             operators[op_id] = {"skills": op_skills, "level": level, "shift": shift, "hours_per_day": hours_per_day}
+    # Opçao Default
     else:
-        # Dados dos operadores predefinidos
+        # Dados dos operadores predefinidos.
         operators = {
             "op1": {"skills": ["pintura", "elétrica"], "level": "sênior", "shift": "manhã", "hours_per_day": 8},
             "op2": {"skills": ["hidráulica", "alvenaria"], "level": "pleno", "shift": "tarde", "hours_per_day": 8},
@@ -41,30 +42,31 @@ def create_sample_data(n_orders=None, n_operators=None):
             "op4": {"skills": ["elétrica", "hidráulica"], "level": "júnior", "shift": "manhã", "hours_per_day": 7},
         }
 
-    # Geração dinâmica de ordens de serviço
+    # Geração dinâmica de ordens de serviço.
     if n_orders:
         service_orders = {}
         for i in range(n_orders):
             required_skills = random.sample(skills, random.randint(1, 2))
-            service_orders[f"ordem{i+1}"] = {
+            service_orders[f"os{i+1}"] = {
                 "required_skills": required_skills,
                 "estimated_hours": random.randint(2, 8),
                 "priority": random.choice(priority_levels),
                 "expected_start_day": random.randint(1, 5),
                 "status": "não_atendida",
             }
+    # Opçao Default.
     else:
         service_orders = {
-            'ordem1': {'required_skills': ['solda', 'alvenaria'], 'estimated_hours': 2, 'priority': 'média', 'expected_start_day': 3, 'status':'não_atendida'},
-            'ordem2': {'required_skills': ['pintura', 'hidráulica'], 'estimated_hours': 8, 'priority': 'alta', 'expected_start_day': 2, 'status':'não_atendida'},
-            'ordem3': {'required_skills': ['hidráulica'], 'estimated_hours': 5, 'priority': 'urgente', 'expected_start_day': 5, 'status':'não_atendida'},
-            'ordem4': {'required_skills': ['hidráulica', 'pintura'], 'estimated_hours': 2, 'priority': 'urgente', 'expected_start_day': 1, 'status':'não_atendida'},
-            'ordem5': {'required_skills': ['alvenaria'], 'estimated_hours': 5, 'priority': 'alta', 'expected_start_day': 3, 'status':'não_atendida'},
-            'ordem6': {'required_skills': ['alvenaria'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 5, 'status':'não_atendida'},
-            'ordem7': {'required_skills': ['elétrica'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 4, 'status':'não_atendida'},
-            'ordem8': {'required_skills': ['solda'], 'estimated_hours': 8, 'priority': 'baixa', 'expected_start_day': 5, 'status':'não_atendida'},
-            'ordem9': {'required_skills': ['pintura'], 'estimated_hours': 3, 'priority': 'baixa', 'expected_start_day': 4, 'status':'não_atendida'},
-            'ordem10': {'required_skills': ['alvenaria', 'solda'], 'estimated_hours': 2, 'priority': 'alta', 'expected_start_day': 5, 'status':'não_atendida'}
+            'os1': {'required_skills': ['solda', 'alvenaria'], 'estimated_hours': 2, 'priority': 'média', 'expected_start_day': 3, 'status':'não_atendida'},
+            'os2': {'required_skills': ['pintura', 'hidráulica'], 'estimated_hours': 8, 'priority': 'alta', 'expected_start_day': 2, 'status':'não_atendida'},
+            'os3': {'required_skills': ['hidráulica'], 'estimated_hours': 5, 'priority': 'urgente', 'expected_start_day': 5, 'status':'não_atendida'},
+            'os4': {'required_skills': ['hidráulica', 'pintura'], 'estimated_hours': 2, 'priority': 'urgente', 'expected_start_day': 1, 'status':'não_atendida'},
+            'os5': {'required_skills': ['alvenaria'], 'estimated_hours': 5, 'priority': 'alta', 'expected_start_day': 3, 'status':'não_atendida'},
+            'os6': {'required_skills': ['alvenaria'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 5, 'status':'não_atendida'},
+            'os7': {'required_skills': ['elétrica'], 'estimated_hours': 7, 'priority': 'baixa', 'expected_start_day': 4, 'status':'não_atendida'},
+            'os8': {'required_skills': ['solda'], 'estimated_hours': 8, 'priority': 'baixa', 'expected_start_day': 5, 'status':'não_atendida'},
+            'os9': {'required_skills': ['pintura'], 'estimated_hours': 3, 'priority': 'baixa', 'expected_start_day': 4, 'status':'não_atendida'},
+            'os10': {'required_skills': ['alvenaria', 'solda'], 'estimated_hours': 2, 'priority': 'alta', 'expected_start_day': 5, 'status':'não_atendida'}
         }
 
     return operators, service_orders
@@ -93,13 +95,21 @@ def meets_minimum_skills(operator_skills, required_skills):
         required_skills (list): Habilidades exigidas pela ordem.
 
     Returns:
-        bool: True se o operador atender pelo menos 50% das habilidades, False caso contrário.
+        meets_minimum (bool): True se o operador atender pelo menos 50% das habilidades, False caso contrário.
+        match_percentage(float): a porcentagem de habilidades atendidas.
     """
-    matching_skills = sum(1 for skill in required_skills if skill in operator_skills)
-    return matching_skills / len(required_skills) >= 0.5
+    matching_skills = set(operator_skills).intersection(required_skills)
+    
+    # Verifica se a porcentagem de habilidades está acima da metade (valor minimo).
+    match_percentage = len(matching_skills) / len(required_skills) if required_skills else 1
+    
+    # Verifica se o operador atende pelo menos 50% das habilidades necessárias
+    meets_minimum = match_percentage >= 0.5
+    
+    return meets_minimum, match_percentage
 
-# Função para calcular a aptidão de uma solução
-def calculate_fitness(solution, operators, orders):
+# Função para calcular a aptidão de uma solução 
+def calculate_fitness(solution, operators, orders, max_days):
     """
     Calcula a pontuação de aptidão de uma solução. A função avalia como uma solução de alocação de ordens a operadores
     é eficaz, levando em consideração a compatibilidade das habilidades, o cumprimento de prazo e o excesso de horas
@@ -124,54 +134,60 @@ def calculate_fitness(solution, operators, orders):
     - **Compatibilidade de habilidades**: Quando a habilidade de um operador não é adequada à ordem, a pontuação é penalizada. A penalidade depende do nível de habilidade do operador em comparação com o nível necessário para a ordem.
     - **Cumprimento do inicio_esperado**: Se a ordem não for completada até o dia limite, é aplicada uma penalidade proporcional à quantidade de dias de atraso e à prioridade da ordem.
     - **Excesso de horas**: Se a soma das horas estimadas para a ordem ultrapassar as horas trabalhadas disponíveis para o operador em um dia, uma penalidade por excesso de horas será aplicada.
-    - **
-
-
-    TODO:
-    aplicar o percentual de match de habilidades no score
-
+    
     A pontuação de aptidão final é a soma das pontuações de compatibilidade, penalidades de atraso e excesso de horas.
     """
     fitness = 0  # Inicia a pontuação de aptidão com zero.
 
-    # Itera sobre cada dia da solução (planejamento).
-    for day, daily_assignments in solution.items():
-        # Para cada operador e as ordens alocadas a ele nesse dia.
-        for operator_id, assigned_orders in daily_assignments.items():
-            operator = operators[operator_id]  # Obtém as informações do operador.
-            daily_hours = 0  # Variável para acumular as horas trabalhadas nesse dia.
+    # Dicionário para rastrear as horas trabalhadas por operador por dia.
+    operator_daily_hours = {op_id: {day: 0 for day in range(1, max_days+1)}
+                            for op_id in operators.keys()}
+    
+    # Itera sobre cada ordem na solução.
+    for order_id, allocation in solution["orders"].items():
+        operator_id = allocation["operator"]
+        day = allocation["day"]
+        status = allocation["status"]
 
-            # Avalia cada ordem alocada ao operador no dia atual.
-            for order_id in assigned_orders:
-                order = orders[order_id]  # Obtém as informações da ordem de serviço.
-                daily_hours += order["estimated_hours"]  # Acumula as horas estimadas para as ordens.
+        # Obtém os dados da ordem e do operador.
+        order = orders[order_id]
+        operator = operators[operator_id]
 
-                # Avaliação de compatibilidade de habilidades: Como as habilidades do operador atendem aos requisitos da ordem.
-                skill_match_score = 0
-                if meets_minimum_skills(operator["skills"], order["required_skills"]):
-                    skill_match_score += 10
-                else:
-                    skill_match_score -= 10
+        # Acumula as horas estimadas para a ordem no operador e dia correspondentes.
+        operator_daily_hours[operator_id][day] += order["estimated_hours"]
 
-                # Avaliação da prioridade e do cumprimento do inicio_esperado:
-                priority_multiplier = priority_to_number(order["priority"])  # Multiplicador de prioridade para penalidades e bônus.
+        # Avaliação de compatibilidade de habilidades.
+        skill_match_score = 0
+        meets_mininum, match_percentage = meets_minimum_skills(operator["skills"], order["required_skills"])
+        
+        # Multiplica o skill_match_score de acordo com a porcentagem de skills possuidas pelo operador.
+        if meets_mininum:
+            skill_match_score += 10 * match_percentage
+        else:
+            skill_match_score -= 10
 
-                # Se a ordem foi concluída após o inicio_esperado, penaliza a solução:
-                if day > order["expected_start_day"]:  # Se o dia atual ultrapassa o inicio_esperado da ordem.
-                    days_late = day - order["expected_start_day"]  # Quantidade de dias de atraso.
-                    fitness -= 5 * priority_multiplier * days_late  # Penaliza com base na prioridade e atraso.
+        # Avaliação da prioridade.
+        priority_multiplier = priority_to_number(order["priority"])
 
-                # Aumenta a pontuação de aptidão com base na compatibilidade de habilidades e na prioridade.
-                fitness += skill_match_score * priority_multiplier
+        # Penaliza atrasos no início esperado.
+        if status == "atrasada":  # Verifica se a ordem está atrasada.
+            days_late =  max(0, day - order["expected_start_day"])
+            fitness -= 5 * days_late * priority_multiplier
 
-            # Verifica se o operador trabalhou mais horas do que sua capacidade diária.
-            if daily_hours > operator["hours_per_day"]:  # Se o total de horas diárias for excedido.
-                excess_hours = daily_hours - operator["hours_per_day"]  # Excesso de horas trabalhadas.
-                fitness -= 5 * excess_hours  # Penaliza com base no excesso de horas trabalhadas.
+        # Aumenta a pontuação com base na compatibilidade de habilidades e prioridade.
+        fitness += skill_match_score * priority_multiplier
 
+    # Verifica o excesso de horas trabalhadas por operador por dia.
+    for operator_id, daily_hours in operator_daily_hours.items():
+        for day, hours_worked in daily_hours.items():
+            excess_hours = max(0, hours_worked - operators[operator_id]["hours_per_day"])  # Garante que excess_hours não seja negativo.
+            if excess_hours > 0:
+                fitness -= 5 * excess_hours  # Penaliza o excesso de horas trabalhadas.
+
+    solution["fitness"] = fitness
     return fitness  # Retorna a pontuação de aptidão final da solução.
 
-# Função para tranformar a solução encontrada em Dtaframe
+# Função para tranformar a solução encontrada em Dataframe
 def solution_to_dataframe(solution, operators, orders):
     """
     Converte a solução final de alocação de ordens a operadores em um DataFrame.
@@ -182,7 +198,8 @@ def solution_to_dataframe(solution, operators, orders):
         orders (dict): Dicionário de ordens de serviço, contendo as habilidades necessárias, horas estimadas, etc.
 
     Returns:
-        pd.DataFrame: Um DataFrame contendo a solução de alocação de ordens com informações detalhadas.
+        df (pd.DataFrame): Um DataFrame contendo a solução de alocação de ordens com informações detalhadas.
+        unassigned_orders (list): Lista de ordens que não foram alocadas.
 
     Detalhes:
     - O DataFrame contém as colunas: dia, id do operador, id da ordem, habilidades da ordem, horas estimadas,
@@ -191,92 +208,108 @@ def solution_to_dataframe(solution, operators, orders):
     data = []
     operator_daily_hours = {}
 
-    for day, assignments in solution.items():
+    for order_id, allocation in solution["orders"].items():
+        day = allocation["day"]
+        operator_id = allocation["operator"]
+        current_status = allocation["status"]
+
+        # Verifica se a ordem foi atribuída a algum operador.
+        if not operator_id:
+            operator_id = "N/A"
+        else:
+            operator = operators[operator_id]
+
+        # Inicializa horas trabalhadas por operador no dia, se necessário.
         if day not in operator_daily_hours:
             operator_daily_hours[day] = {}
+        if operator_id not in operator_daily_hours[day]:
+            operator_daily_hours[day][operator_id] = 0
 
-        for operator_id, order_ids in assignments.items():
-            if operator_id not in operator_daily_hours[day]:
-                operator_daily_hours[day][operator_id] = 0
+        # Dados da ordem.
+        order = orders[order_id]
+        required_skills = set(order["required_skills"])
+        operator_skills = set(operator["skills"])
 
-            for order_id in order_ids:
-                order = orders[order_id]
-                operator = operators[operator_id]
+        matched_skills = required_skills & operator_skills
+        missing_skills = required_skills - operator_skills
 
-                # Calcular compatibilidade de habilidades
-                required_skills = set(order["required_skills"])
-                operator_skills = set(operator["skills"])
+        skill_compatibility = len(matched_skills) / len(required_skills) if required_skills else 1.0
 
-                matched_skills = required_skills & operator_skills
-                missing_skills = required_skills - operator_skills
+        # Verificar compatibilidade do nível com a prioridade.
+        priority_level_map = {
+            "alta": ["especialista", "sênior"],
+            "urgente": ["especialista", "sênior"],
+            "média": ["especialista", "sênior", "pleno"],
+            "baixa": ["especialista", "sênior", "pleno", "júnior"]
+        }
 
-                skill_compatibility = len(matched_skills) / len(required_skills) if required_skills else 1.0
+        priority = order["priority"]
+        operator_level = operator["level"]
+        compatibility_level = "OK" if operator_level in priority_level_map.get(priority, []) else "NOK"
 
-                # Verificar compatibilidade do nível com a prioridade
-                priority_level_map = {
-                    "alta": ["especialista", "sênior"],
-                    "urgente": ["especialista", "sênior"],
-                    "média": ["especialista", "sênior", "pleno"],
-                    "baixa": ["especialista", "sênior", "pleno", "júnior"]
-                }
+        # Acumular horas do operador no dia.
+        operator_daily_hours[day][operator_id] += order["estimated_hours"]
+        total_hours = operator_daily_hours[day][operator_id]
+        extra_hours = "Sim" if total_hours > operator["hours_per_day"] else "Não"
+        total_extra_hours = total_hours - operator["hours_per_day"]
 
-                priority = order["priority"]
-                operator_level = operator["level"]
+        # Montar os dados da linha.
+        row = {
+            "dia": day,  # Dias começam de 1.
+            "id_ordem": order_id,
+            "id_operador": operator_id,
+            "Serviços": " | ".join(order["required_skills"]),  # Formatação das habilidades.
+            "habilidades_operador": " | ".join(operator["skills"]),
+            "nivel_operador": operator["level"],
+            "horas_estimadas": order["estimated_hours"],
+            "horas_disponiveis": operator["hours_per_day"],
+            "prioridade": order["priority"],
+            "inicio_esperado": order["expected_start_day"],
+            "atraso": max(0, day - order["expected_start_day"]),
+            "compatibilidade_os_op": round(skill_compatibility * 100, 2),
+            "habilidades_nao_atendidas": " | ".join(missing_skills),
+            "compatibilidade_prioridade": compatibility_level,
+            "hora_extra": extra_hours,
+            "total_hora_extra": total_extra_hours,
+            "status": current_status,
+        }
 
-                compatibility_level = (
-                    "OK" if operator_level in priority_level_map.get(priority, []) else "NOK"
-                )
+        data.append(row)
 
-                # Acumular horas do operador no dia
-                operator_daily_hours[day][operator_id] += order["estimated_hours"]
-                total_hours = operator_daily_hours[day][operator_id]
-                extra_hours = "Sim" if total_hours > operator["hours_per_day"] else "Não"
-                total_extra_hours = total_hours - operator["hours_per_day"]
-                row = {
-                    "dia": day + 1,  # Dias começam de 1
-                    "id_operador": operator_id,
-                    "id_ordem": order_id,
-                    "habilidades_ordem": " | ".join(order["required_skills"]),  # Formatação das habilidades
-                    "habilidades_operador": " | ".join(operator["skills"]),
-                    "nivel_operador": operator["level"],
-                    "horas_estimadas": order["estimated_hours"],
-                    "horas_disponiveis": operator["hours_per_day"],
-                    "prioridade": order["priority"],
-                    "inicio_esperado": order["expected_start_day"],
-                    "atraso": day + 1 - order["expected_start_day"],
-                    "compatibilidade_habilidade": round(skill_compatibility * 100, 2),
-                    "habilidades_nao_atendidas": " | ".join(missing_skills),
-                    "compatibilidade_nivel_prioridade": compatibility_level,
-                    "hora_extra": extra_hours,
-                    "total_hora_extra": 0 if total_extra_hours <= 0 else total_extra_hours,
-                    "status": order["status"],
-                }
-
-                data.append(row)
-
+    # Converte os dados em um DataFrame.
     df = pd.DataFrame(data)
+
+    # Identifica ordens não alocadas.
     unassigned_orders = list(set(orders.keys()) - set(df["id_ordem"].unique()))
+
     return df, unassigned_orders
 
-def orders_to_dataframe(service_orders):
+# Converte os dados de exemplo em dataframe para facilitar a visualização
+def orders_to_dataframe(orders):
     """
-    Converte um dicionário de ordens de serviço em um DataFrame do pandas.
+    Converte os dados simulados de ordens de serviço em um DataFrame.
 
     Args:
-        service_orders (dict): Dicionário contendo os detalhes das ordens de serviço.
+        orders (dict): Dicionário com ordens de serviço, incluindo habilidades exigidas, horas estimadas, prioridade, inicio_esperado e status.
 
     Returns:
-        pd.DataFrame: DataFrame contendo os detalhes das ordens de serviço.
+        pd.DataFrame: DataFrame com os dados das ordens de serviço.
+
+    Detalhes:
+    - O DataFrame das ordens de serviço inclui as colunas: 'id_ordem', 'Serviços', 'horas_estimadas', 'prioridade', 
+        'inicio_esperado', 'status'.
     """
+
     # Converte as ordens de serviço em um DataFrame
     service_orders_data = []
-    for order_id, details in service_orders.items():
+    for order_id, details in orders.items():
         service_orders_data.append({
-            "order_id": order_id,
-            "required_skills": " | ".join(details["required_skills"]),
-            "estimated_hours": details["estimated_hours"],
-            "priority": details["priority"],
-            "expected_start_day": details["expected_start_day"]
+            "id_ordem": order_id,
+            "Serviços": " | ".join(details["required_skills"]),
+            "horas_estimadas": details["estimated_hours"],
+            "prioridade": details["priority"],
+            "inicio_esperado": details["expected_start_day"],
+            "status": details["status"],
         })
 
     service_orders_df = pd.DataFrame(service_orders_data)

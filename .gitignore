@@ -131,3 +131,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+/tech-challenge/fase2/functions/__pycache__
+/tech-challenge/fase2/__pycache__
+tech-challenge/fase2/resultados/
+tech-challenge/fase2/functions/resultados/
