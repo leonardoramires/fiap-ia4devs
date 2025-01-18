@@ -115,7 +115,7 @@ if __name__ == '__main__':
     operators, orders = cf.create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"])
 
     # Executa os algoritmos de comparação
-    run_algorithm_comparison(operators, orders)    
+    # run_algorithm_comparison(operators, orders)    
 
     if "genetic_algorithm" not in algorithms_to_perform:
         exit()
@@ -219,7 +219,7 @@ if __name__ == '__main__':
                 best_solution_df, unassigned_orders = algorithms[selected_algorithm].solution_to_dataframe(best_solution, operators, orders)
 
                 # Imprime relatorio
-                algorithms[selected_algorithm].imprimir_resultados_alocacao(best_solution_df, unassigned_orders, orders)
+                cf.imprimir_resultados_alocacao(best_solution_df, unassigned_orders, orders)
 
                 # Exibe os resultados.
                 print("Dados dos operadores: \n", operators_df)
@@ -231,7 +231,7 @@ if __name__ == '__main__':
                     print("\nOrdens não alocadas:\n", orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
 
                 # Salva os resultados em arquivo.
-                algorithms[selected_algorithm].salvar_arquivos(best_solution_df)
+                cf.salvar_arquivos(best_solution_df)
               
         if pause:
             pgf.draw_text(screen, "PAUSADO", screen.get_width() // 2, screen.get_height() // 2, font_size=30, font='Courier New')
