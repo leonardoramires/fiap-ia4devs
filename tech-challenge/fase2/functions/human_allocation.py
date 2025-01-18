@@ -13,7 +13,11 @@ def human_allocation(operators, orders, days=5):
         dict: Solução de alocação de ordens a operadores por dia.
     """
     # Inicializa a solução
-    solution = {day: {op: [] for op in operators.keys()} for day in range(days)}
+    # solution = {day: {op: [] for op in operators.keys()} for day in range(days)}
+    solution = {
+        "orders": {},
+        "fitness": 0
+    }
 
     # Separa as ordens em grupos de prioridade
     priority_groups = {}
@@ -30,13 +34,19 @@ def human_allocation(operators, orders, days=5):
     for priority in sorted_priorities:
         for order_id, order in priority_groups[priority]:
             assigned = False
-            for day in range(days):
+            for day in range(1, days+1):
                 for operator_id, operator in operators.items():
                     if meets_minimum_skills(operator["skills"], order["required_skills"]):
                         # Verifica se o operador tem horas disponíveis no dia
-                        total_hours = sum(orders[order_id]["estimated_hours"] for order_id in solution[day][operator_id])
+                        total_hours = sum(
+                            order["estimated_hours"]
+                            for assigned_order_id, order in orders.items()
+                            if assigned_order_id in solution["orders"] and
+                            solution["orders"][assigned_order_id]["operator"] == operator_id and
+                            solution["orders"][assigned_order_id]["day"] == day
+                        )
                         if total_hours + order["estimated_hours"] <= operator["hours_per_day"]:
-                            solution[day][operator_id].append(order_id)
+                            solution["orders"][order_id] = {"day": day, "operator": operator_id, "status": "atendida"}
                             assigned = True
                             break
                 if assigned:
