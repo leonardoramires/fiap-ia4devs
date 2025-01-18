@@ -47,13 +47,15 @@ def run_greedy_algorithm(operators, orders):
     greedy_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
     solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Greedy Algorithm):", greedy_fitness)
-    if len(unassigned_orders) > 0:
-        orders_df = cf.orders_to_dataframe(orders)
-        print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
-        print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-        # print("\nOrdens não alocadas:\n", orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    solution_df.to_csv("result_greedy_algorithm.csv", index=False)
-    orders_df.to_csv("unassigned_orders_greedy_algorithm.csv", index=False)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.salvar_arquivos(solution_df, 'greedy_algorithm')
+    # if len(unassigned_orders) > 0:
+    #     orders_df = cf.orders_to_dataframe(orders)
+    #     print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
+    #     print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
+    #     # print("\nOrdens não alocadas:\n", orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
+    # solution_df.to_csv("result_greedy_algorithm.csv", index=False)
+    # orders_df.to_csv("unassigned_orders_greedy_algorithm.csv", index=False)
     print("\n")
 
 def run_linear_algorithm(operators, orders):
@@ -115,7 +117,7 @@ if __name__ == '__main__':
     operators, orders = cf.create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"])
 
     # Executa os algoritmos de comparação
-    # run_algorithm_comparison(operators, orders)    
+    run_algorithm_comparison(operators, orders)    
 
     if "genetic_algorithm" not in algorithms_to_perform:
         exit()

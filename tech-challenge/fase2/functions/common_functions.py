@@ -512,12 +512,12 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
         'taxa_atendimento_inadequado': (inadequados/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
     }
 
-def salvar_arquivos(dataframe):
+def salvar_arquivos(dataframe, algorithm_name = 'genetic_algorithm'):
     # Diretório do script em execução
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Defina o diretório onde os arquivos serão salvos
-    result_dir = os.path.join(script_dir, "./../resultados")
+    result_dir = os.path.join(script_dir, f"./../resultados_{algorithm_name}")
 
     # Cria o diretório se não existir
     os.makedirs(result_dir, exist_ok=True)
