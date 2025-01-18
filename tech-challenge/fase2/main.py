@@ -56,13 +56,8 @@ def run_linear_algorithm(operators, orders):
     linear_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
     solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Linear Programming):", linear_fitness)
-    if len(unassigned_orders) > 0:
-        orders_df = cf.orders_to_dataframe(orders)
-        print(f"\n As ordens abaixo não puderam ser alocadas ({len(unassigned_orders)}): ")
-        print(orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
-    solution_df.to_csv("result_linear_programming.csv", index=False)
-    orders_df.to_csv("unassigned_orders_linear_programming.csv", index=False)
-    print("\n")
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.salvar_arquivos(solution_df, 'greedy_algorithm')
 
 def run_human_allocation(operators, orders):
     print("="*35 + " Human Allocation " + "="*35)
@@ -77,8 +72,8 @@ def run_algorithm_comparison(operators, orders):
     if "greedy_algorithm" in algorithms_to_perform:
         run_greedy_algorithm(operators, orders)
     
-    # if "linear_programming_algorithm" in algorithms_to_perform:
-    #     run_linear_algorithm(operators, orders)
+    if "linear_programming_algorithm" in algorithms_to_perform:
+        run_linear_algorithm(operators, orders)
 
     if "human_allocation" in algorithms_to_perform:
         run_human_allocation(operators, orders)
