@@ -218,6 +218,9 @@ if __name__ == '__main__':
                 # Conversão dos dados da melhor solução encontrada em Dataframe.
                 best_solution_df, unassigned_orders = algorithms[selected_algorithm].solution_to_dataframe(best_solution, operators, orders)
 
+                # Imprime relatorio
+                algorithms[selected_algorithm].imprimir_resultados_alocacao(best_solution_df, unassigned_orders, orders)
+
                 # Exibe os resultados.
                 print("Dados dos operadores: \n", operators_df)
                 print("Dados das ordens: \n", orders_df)
