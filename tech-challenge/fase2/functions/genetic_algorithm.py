@@ -561,7 +561,7 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
     print("RELATÓRIO DETALHADO DE ALOCAÇÃO".center(80))
     print("="*80)
 
-    # 1. Estatísticas Gerais.
+    # 1. Estatísticas Gerais
     total_ordens = len(orders)
     ordens_alocadas = len(df['id_ordem'].unique())
     ordens_nao_alocadas = len(unassigned_orders)
@@ -572,7 +572,7 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
     print(f"Ordens Alocadas: {ordens_alocadas} ({(ordens_alocadas/total_ordens)*100:.1f}%)")
     print(f"Ordens Não Alocadas: {ordens_nao_alocadas}")
 
-    # 2. Análise por Prioridade.
+    # 2. Análise por Prioridade
     print("\n2. ANÁLISE POR PRIORIDADE")
     print("-"*40)
     for prioridade in ['urgente', 'alta', 'média', 'baixa']:
@@ -580,41 +580,106 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
         if count > 0:
             print(f"Prioridade {prioridade:8s}: {count:3d} ordens ({(count/ordens_alocadas)*100:5.1f}%)")
 
-    # 3. Análise por Operador.
+    # 3. Análise por Operador
     print("\n3. ANÁLISE POR OPERADOR")
     print("-"*40)
     for operador in df['id_operador'].unique():
         df_op = df[df['id_operador'] == operador]
         horas_total = df_op['horas_estimadas'].sum()
-        horas_disp = df_op['horas_disponiveis'].iloc[0] if not df_op.empty else 0
+        horas_disp = df_op['horas_disponiveis'].iloc[0]
+        percentual = (horas_total/(horas_disp*5))*100
         n_ordens = len(df_op)
         print(f"Operador {operador}:")
         print(f"  - Ordens alocadas: {n_ordens}")
-        print(f"  - Horas alocadas: {horas_total:.1f}h de {horas_disp:.1f}h ({(horas_total/horas_disp)*100:.1f}%)")
-
-    # 4. Análise de Prazos.
+        print(f"  - Horas alocadas: {horas_total:.1f}h de {horas_disp*5:.1f}h ({percentual:.1f}%)")
+    # 4. Análise de Prazos
     print("\n4. ANÁLISE DE PRAZOS")
     print("-"*40)
     
     ordens_no_prazo = len(df[df['atraso'] <= 0])
     print(f"Ordens no Prazo: {ordens_no_prazo} ({(ordens_no_prazo/ordens_alocadas)*100:.1f}%)")
     
-    atrasos = df[df['atraso'] > 0]
-    if not atrasos.empty:
+    if len(df[df['atraso'] > 0]) > 0:
         print("\nDetalhamento dos Atrasos:")
-        for _, row in atrasos.iterrows():
+        for _, row in df[df['atraso'] > 0].iterrows():
             print(f"  Ordem {row['id_ordem']}: {row['atraso']} dias de atraso (Prioridade: {row['prioridade']})")
 
-    # 5. Análise de Habilidades.
-    print("\n5. ANÁLISE DE COMPATIBILIDADE")
+    # 5. Análise de Atendimentos por Fitness
+    print("\n5. ANÁLISE DE ATENDIMENTOS POR FITNESS")
     print("-"*40)
 
-    matches_perfeitos = len(df[df['compatibilidade_os_op'] == 1])
-    compatibilidade_media = df['compatibilidade_os_op'].mean() if not df.empty else 0
-    print(f"Matches Perfeitos: {matches_perfeitos} ({(matches_perfeitos/ordens_alocadas)*100:.1f}%)")
-    print(f"Compatibilidade Média: {compatibilidade_media:.1f}%")
+    # Análise de atendimento baseada nos critérios do fitness
+    atendimentos = {
+        'total': [],
+        'parcial': [],
+        'inadequado': []
+    }
 
-    # 6. Análise por Dia.
+    for _, row in df.iterrows():
+        # Converte strings de habilidades em conjuntos para comparação
+        required_skills = set(row['Serviços'].split(" | "))
+        operator_skills = set(row['habilidades_operador'].split(" | "))
+
+        # Calcula o percentual de match de habilidades
+        matching_skills = len(required_skills.intersection(operator_skills))
+        skill_match_percent = matching_skills / len(required_skills)
+
+        # Verifica condições de atendimento
+        dentro_prazo = row['atraso'] <= 0
+        horas_ok = row['horas_estimadas'] <= row['horas_disponiveis']
+
+        # Classifica o atendimento
+        if skill_match_percent == 1 and dentro_prazo and horas_ok:
+            atendimentos['total'].append(row['id_ordem'])
+        elif skill_match_percent >= 0.5:
+            atendimentos['parcial'].append(row['id_ordem'])
+        else:
+            atendimentos['inadequado'].append(row['id_ordem'])
+
+    # Imprime estatísticas gerais
+    total_atendidos = len(atendimentos['total'])
+    parcial_atendidos = len(atendimentos['parcial'])
+    inadequados = len(atendimentos['inadequado'])
+
+    print("Estatísticas Gerais de Atendimento:")
+    print(f"  - Atendimento Total:    {total_atendidos:3d} ordens ({(total_atendidos/ordens_alocadas)*100:5.1f}%)")
+    print(f"  - Atendimento Parcial:  {parcial_atendidos:3d} ordens ({(parcial_atendidos/ordens_alocadas)*100:5.1f}%)")
+    print(f"  - Atendimento Inadequado: {inadequados:3d} ordens ({(inadequados/ordens_alocadas)*100:5.1f}%)")
+
+    # Análise detalhada por tipo de atendimento
+    print("\nDetalhamento dos Atendimentos:")
+
+    if atendimentos['total']:
+        print("\nOrdens com Atendimento Total:")
+        for ordem_id in atendimentos['total']:
+            ordem = df[df['id_ordem'] == ordem_id].iloc[0]
+            print(f"  ✓ Ordem {ordem_id}: "
+                  f"Skills={ordem['Serviços']}, "
+                  f"Operador={ordem['id_operador']}, "
+                  f"Inicio Esperado={ordem['inicio_esperado']}, "
+                  f"Dia Alocado={ordem['dia']}")
+
+    if atendimentos['parcial']:
+        print("\nOrdens com Atendimento Parcial:")
+        for ordem_id in atendimentos['parcial']:
+            ordem = df[df['id_ordem'] == ordem_id].iloc[0]
+            print(f"  ⚠ Ordem {ordem_id}: "
+                  f"Skills={ordem['Serviços']}, "
+                  f"Operador={ordem['id_operador']} ({ordem['habilidades_operador']}), "
+                  f"Inicio Esperado={ordem['inicio_esperado']}, "
+                  f"Dia Alocado={ordem['dia']}")
+
+    if atendimentos['inadequado']:
+        print("\nOrdens com Atendimento Inadequado:")
+        for ordem_id in atendimentos['inadequado']:
+            ordem = df[df['id_ordem'] == ordem_id].iloc[0]
+            print(f"  ✗ Ordem {ordem_id}: "
+                  f"Skills={ordem['Serviços']}, "
+                  f"Operador={ordem['id_operador']} ({ordem['habilidades_operador']}), "
+                  f"Inicio Esperado={ordem['inicio_esperado']}, "
+                  f"Dia Alocado={ordem['dia']}")
+
+    # 6. Análise por Dia
     print("\n6. DISTRIBUIÇÃO POR DIA")
     print("-"*40)
     for dia in sorted(df['dia'].unique()):
@@ -628,13 +693,13 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
             if count > 0:
                 print(f"    * {prioridade:8s}: {count:3d}")
 
-    # 7. Ordens Não Alocadas.
+    # 7. Ordens Não Alocadas
     if unassigned_orders:
         print("\n7. ORDENS NÃO ALOCADAS")
         print("-"*40)
         print(f"Total de ordens não alocadas: {len(unassigned_orders)}")
         
-        # Agrupa por prioridade.
+        # Agrupa por prioridade
         unassigned_by_priority = {}
         for order_id in unassigned_orders:
             priority = orders[order_id]['priority']
@@ -642,28 +707,38 @@ def imprimir_resultados_alocacao(df, unassigned_orders, orders):
                 unassigned_by_priority[priority] = []
             unassigned_by_priority[priority].append(order_id)
         
-        for priority, order_list in unassigned_by_priority.items():
-            print(f"\nPrioridade {priority}: {len(order_list)} ordens")
-            for order_id in order_list:
-                order = orders[order_id]
-                print(f"  - {order_id}: Skills={', '.join(order['required_skills'])}, "
-                      f"Horas={order['estimated_hours']}, Prazo={order['expected_start_day']}")
+        for priority in ['urgente', 'alta', 'média', 'baixa']:
+            if priority in unassigned_by_priority:
+                orders_list = unassigned_by_priority[priority]
+                print(f"\nPrioridade {priority}: {len(orders_list)} ordens")
+                for order_id in orders_list:
+                    order = orders[order_id]
+                    print(f"  - {order_id}: "
+                          f"Skills={', '.join(order['required_skills'])}, "
+                          f"Horas={order['estimated_hours']}, "
+                          f"Prazo={order['expected_start_day']}")
 
     print("\n" + "="*80)
     print("FIM DO RELATÓRIO".center(80))
     print("="*80)
 
-    # Retorna métricas principais para uso no algoritmo genético.
+    # Retorna métricas principais para uso no algoritmo genético
     return {
         'total_ordens': total_ordens,
         'ordens_alocadas': ordens_alocadas,
         'ordens_nao_alocadas': ordens_nao_alocadas,
         'taxa_alocacao': (ordens_alocadas/total_ordens)*100,
-        'matches_perfeitos': matches_perfeitos,
-        'taxa_matches_perfeitos': (matches_perfeitos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
-        'compatibilidade_media': compatibilidade_media,
+        'matches_perfeitos': total_atendidos,
+        'taxa_matches_perfeitos': (total_atendidos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'compatibilidade_media': df['compatibilidade_os_op'].mean()*100 if not df.empty else 0,
         'ordens_no_prazo': ordens_no_prazo,
-        'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
+        'taxa_cumprimento_prazo': (ordens_no_prazo/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'atendimento_total': total_atendidos,
+        'atendimento_parcial': parcial_atendidos,
+        'atendimento_inadequado': inadequados,
+        'taxa_atendimento_total': (total_atendidos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'taxa_atendimento_parcial': (parcial_atendidos/ordens_alocadas)*100 if ordens_alocadas > 0 else 0,
+        'taxa_atendimento_inadequado': (inadequados/ordens_alocadas)*100 if ordens_alocadas > 0 else 0
     }
     
 def salvar_arquivos(dataframe):
