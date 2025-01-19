@@ -1,6 +1,5 @@
-import pandas as pd
 import pulp
-import functions as F
+from .common_functions import *
 
 def linear_programming_allocation(operators, orders, days=5):
     """
@@ -21,33 +20,46 @@ def linear_programming_allocation(operators, orders, days=5):
     x = pulp.LpVariable.dicts("x", ((day, op, order) for day in range(days) for op in operators for order in orders), cat='Binary')
 
     # Função objetivo: maximizar a aptidão total
-    prob += pulp.lpSum(F.priority_to_number(orders[order]["priority"]) * x[day, op, order] for day in range(days) for op in operators for order in orders)
+    prob += pulp.lpSum(priority_to_number(orders[order]["priority"]) * x[day, op, order] for day in range(days) for op in operators for order in orders)
 
     # Restrição: cada ordem deve ser atribuída a exatamente um operador em um dia
-    for order in orders:
-        prob += pulp.lpSum(x[day, op, order] for day in range(days) for op in operators) == 1
+    for order_id in orders:
+        prob += pulp.lpSum(x[day, op, order_id] for day in range(days) for op in operators) == 1
 
     # Restrição: as habilidades do operador devem atender às habilidades necessárias para a ordem
     for day in range(days):
-        for op in operators:
-            for order in orders:
-                if not F.meets_minimum_skills(operators[op]["skills"], orders[order]["required_skills"]):
-                    prob += x[day, op, order] == 0
+        for operator_id in operators:
+            for order_id in orders:
+                if not meets_minimum_skills(operators[operator_id]["skills"], orders[order_id]["required_skills"]):
+                    prob += x[day, operator_id, order_id] == 0
 
     # Restrição: as horas de trabalho do operador não devem exceder as horas disponíveis
     for day in range(days):
-        for op in operators:
-            prob += pulp.lpSum(orders[order]["estimated_hours"] * x[day, op, order] for order in orders) <= operators[op]["hours_per_day"]
+        for operator_id in operators:
+            prob += pulp.lpSum(orders[order]["estimated_hours"] * x[day, operator_id, order] for order in orders) <= operators[operator_id]["hours_per_day"]
 
     # Resolve o problema sem exibir mensagens no terminal
     prob.solve(pulp.PULP_CBC_CMD(msg=False))
 
+    # Inicializa a solução
+    solution = {
+        "orders": {},
+        "fitness": 0
+    }
+
     # Cria a solução a partir das variáveis de decisão
-    solution = {day: {op: [] for op in operators} for day in range(days)}
     for day in range(days):
-        for op in operators:
-            for order in orders:
-                if pulp.value(x[day, op, order]) == 1:
-                    solution[day][op].append(order)
+        for operator_id in operators:
+            for order_id in orders:
+                if pulp.value(x[day, operator_id, order_id]) == 1:
+                    # Calcula a quantidade de dias em atraso, se late_order > 0 = atraso.. 
+                    late_order = day - orders[order_id]["expected_start_day"]
+
+                    order_status = "atendida"
+                    if late_order > 0:
+                        order_status = "atrasada"
+
+                    # Atualiza a solução para a OS atual
+                    solution["orders"][order_id] = {"day": day+1, "operator": operator_id, "status": order_status}
 
     return solution

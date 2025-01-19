@@ -1,5 +1,9 @@
 # Imports das funções dos algoritmos
 from functions import algorithms
+from functions import common_functions as cf
+from functions import greedy_algorithm as ga
+from functions import linear_programming_algorithm as lp
+from functions import human_allocation as ha
 
 # Imports para o funcionamento do PyGame
 import pygame
@@ -9,6 +13,7 @@ import itertools
 
 # Imports gerais
 import random
+import argparse
 
 # TODO Colocar no streamlit, executar e print o DF (pandas) no final.
 # colocar disponivel para que uma pessoa possa colocar um arquivo de texto e que ela consiga colocar as orders e operadores pra rodar.
@@ -22,19 +27,56 @@ pygame.display.set_caption("Loop de Gerações")
 clock = pygame.time.Clock()
 
 # =========== VARs GLOBAIS ===========
-FPS = 10    # Velocidade de atualizaçao dos frames do PyGame.
+FPS = 10    # Velocidade de atualizaçao dos frames do PyGame
 cor_fundo = [204, 204, 204]
 
 params = {
     "_N_ORDERS" : 100,
-    "_N_OPERATORS" : 15,
+    "_N_OPERATORS" : 10,
     "_POPULATION_SIZE" : 50,
-    "_GENERATIONS" : 100,
+    "_GENERATIONS" : 50,
     "_MUTATION_RATE" : 0.3,
     "_ELITISM_SIZE" : 5,
     "_REINITIALIZE_INTERVAL" : 10,
-    "_DAYS": 5,   # Dias a serem organizados pelo algoritmo.
+    "_DAYS": 5,  
 }
+
+def run_greedy_algorithm(operators, orders):
+    print("="*35 + " Greedy Algorithm " + "="*35)
+    solution = ga.greedy_allocation(operators, orders)
+    greedy_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
+    solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    print("Fitness (Greedy Algorithm):", greedy_fitness)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.salvar_arquivos(solution_df, 'greedy_algorithm')
+
+def run_linear_algorithm(operators, orders):
+    print("="*30 + " Linear Programming Algorithm " + "="*29)
+    solution = lp.linear_programming_allocation(operators, orders)
+    linear_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
+    solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    print("Fitness (Linear Programming):", linear_fitness)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.salvar_arquivos(solution_df, 'greedy_algorithm')
+
+def run_human_allocation(operators, orders):
+    print("="*35 + " Human Allocation " + "="*35)
+    solution = ha.human_allocation(operators, orders)
+    human_allocation_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
+    solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
+    print("Fitness (Alocação Humana):", human_allocation_fitness)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.salvar_arquivos(solution_df, 'human_allocation')
+
+def run_algorithm_comparison(operators, orders):
+    if "greedy_algorithm" in algorithms_to_perform:
+        run_greedy_algorithm(operators, orders)
+    
+    if "linear_programming_algorithm" in algorithms_to_perform:
+        run_linear_algorithm(operators, orders)
+
+    if "human_allocation" in algorithms_to_perform:
+        run_human_allocation(operators, orders)
 
 if __name__ == '__main__':
     """
@@ -42,15 +84,27 @@ if __name__ == '__main__':
         Args:   "genetic_algorithm"
                 "linear_programming_algorithm"
                 "greedy_algorithm"
+                "human_allocation"
     """
-    # Escolha do algoritmo.
-    selected_algorithm = "genetic_algorithm"
+    # parser para escolha do algoritmo
+    algorithm_keys = list(algorithms.keys())
+    parser = argparse.ArgumentParser(description="Escolha o algoritmo de alocação a ser utilizado.")
+    parser.add_argument('--algorithm', choices=algorithm_keys, help="Algoritmo de alocação a ser utilizado: 'genetic_algorithm', 'greedy_algorithm', 'linear_programming_algorithm' ou 'human_allocation'")
+    args = parser.parse_args()
 
-    if selected_algorithm not in algorithms:
-        raise ValueError(f"Algoritmo '{selected_algorithm}' não encontrado!")
+    # Escolha do algoritmo
+    algorithms_to_perform = algorithm_keys if args.algorithm is None else [args.algorithm]
 
     # Inicializa operadores e ordens iniciais.
-    operators, orders = algorithms[selected_algorithm].create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"])
+    operators, orders = cf.create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"])
+
+    # Executa os algoritmos de comparação
+    run_algorithm_comparison(operators, orders)    
+
+    if "genetic_algorithm" not in algorithms_to_perform:
+        exit()
+
+    selected_algorithm = "genetic_algorithm"
     
     # Gera populaçao inicial com base nos operadores e ordens iniciais.
     population = [algorithms[selected_algorithm].create_initial_solution(operators, orders, params["_DAYS"]) 
@@ -148,6 +202,9 @@ if __name__ == '__main__':
                 # Conversão dos dados da melhor solução encontrada em Dataframe.
                 best_solution_df, unassigned_orders = algorithms[selected_algorithm].solution_to_dataframe(best_solution, operators, orders)
 
+                # Imprime relatorio
+                cf.imprimir_resultados_alocacao(best_solution_df, unassigned_orders, orders)
+
                 # Exibe os resultados.
                 print("Dados dos operadores: \n", operators_df)
                 print("Dados das ordens: \n", orders_df)
@@ -158,7 +215,7 @@ if __name__ == '__main__':
                     print("\nOrdens não alocadas:\n", orders_df.loc[orders_df["order_id"].isin(unassigned_orders)])
 
                 # Salva os resultados em arquivo.
-                algorithms[selected_algorithm].salvar_arquivos(best_solution_df)
+                cf.salvar_arquivos(best_solution_df)
               
         if pause:
             pgf.draw_text(screen, "PAUSADO", screen.get_width() // 2, screen.get_height() // 2, font_size=30, font='Courier New')
