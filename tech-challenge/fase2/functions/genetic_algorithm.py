@@ -340,7 +340,7 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
 
     # Conversão dos dados da melhor solução encontrada em Dataframe.
     final_df, unassigned_orders = solution_to_dataframe(best_solution, operators, orders)
-    imprimir_resultados_alocacao(final_df, unassigned_orders, orders)
+    imprimir_resultados_alocacao(final_df, unassigned_orders, orders, "Genetic Algorithm")
     
     return final_df, unassigned_orders
  

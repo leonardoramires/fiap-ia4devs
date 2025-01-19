@@ -47,7 +47,7 @@ def run_greedy_algorithm(operators, orders):
     greedy_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
     solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Greedy Algorithm):", greedy_fitness)
-    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders, "greedy_algorithm")
     cf.salvar_arquivos(solution_df, 'greedy_algorithm')
 
 def run_linear_algorithm(operators, orders):
@@ -56,7 +56,7 @@ def run_linear_algorithm(operators, orders):
     linear_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
     solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Linear Programming):", linear_fitness)
-    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders, "linear_programming")
     cf.salvar_arquivos(solution_df, 'greedy_algorithm')
 
 def run_human_allocation(operators, orders):
@@ -65,7 +65,7 @@ def run_human_allocation(operators, orders):
     human_allocation_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
     solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Alocação Humana):", human_allocation_fitness)
-    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders)
+    cf.imprimir_resultados_alocacao(solution_df, unassigned_orders, orders, "human_allocation")
     cf.salvar_arquivos(solution_df, 'human_allocation')
 
 def run_algorithm_comparison(operators, orders):
@@ -203,7 +203,7 @@ if __name__ == '__main__':
                 best_solution_df, unassigned_orders = algorithms[selected_algorithm].solution_to_dataframe(best_solution, operators, orders)
 
                 # Imprime relatorio
-                cf.imprimir_resultados_alocacao(best_solution_df, unassigned_orders, orders)
+                cf.imprimir_resultados_alocacao(best_solution_df, unassigned_orders, orders, selected_algorithm)
 
                 # Exibe os resultados.
                 print("Dados dos operadores: \n", operators_df)
