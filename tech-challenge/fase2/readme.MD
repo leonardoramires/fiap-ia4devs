@@ -13,20 +13,30 @@ Alunos:
 - [Link para o vídeo do projeto]()
 
 ## Definição do Problema
-O problema consiste em alocar ordens de serviço (OS) de manutenção para operadores de forma otimizada, considerando as habilidades necessárias para cada ordem e as habilidades dos operadores disponíveis. O objetivo é minimizar o tempo de execução das ordens, evitar horas extras desnecessárias e garantir que as ordens sejam atendidas dentro do prazo estipulado.
+O problema consiste em alocar ordens de serviço (OS) de manutenção para operadores de forma otimizada, considerando as habilidades necessárias para cada ordem e as habilidades dos operadores disponíveis. 
+
+O problema a ser resolvido é maximizar a produtividade operacional, assegurando o cumprimento dos prazos estabelecidos, evitar horas extras desnecessárias e garantir que as ordens sejam atendidas dentro do prazo estipulado.
 
 
 ## Objetivos
+O projeto aborda o desafio crítico de otimização na alocação de ordens de serviço (OS) de manutenção. Através de um algoritmo especializado, o sistema realiza o pareamento preciso entre as competências técnicas dos operadores e as exigências específicas de cada ordem.
+
 Alocar ordens de serviço de forma eficiente, maximizando a compatibilidade entre as habilidades dos operadores e as habilidades necessárias para as ordens.
 Minimizar o número de horas extras trabalhadas pelos operadores.
 Garantir que as ordens de maior prioridade sejam atendidas dentro do prazo.
 
 
 ## O Projeto
-![Fluxograma Genético do Algoritmo Genético](assets/fluxograma.png)
+![Fluxograma Genético do Algoritmo Genético](assets/fluxograma.jpeg)
+
 *Figura 1: Fluxograma Genérico do Algoritmo Genético*
 
-Este projeto foi desenvolvido utilizando um algoritmo genético para otimizar a alocação de ordens de serviço aos operadores. Abaixo estão os pontos essenciais da solução:
+Este projeto foi desenvolvido utilizando um algoritmo genético para otimizar a alocação de ordens de serviço aos operadores. As seguintes informações relevantes sobre as ordens e operadores são utilizadas para a otimização:
+
+- **Dados das ordens**: Incluem o tempo estimado de execução, habilidades necessárias, prioridade, status, e o dia esperado de início do atendimento.
+- **Dados dos operadores**: Contêm as habilidades disponíveis, nível de qualificação e horas disponíveis.
+
+Abaixo estão os pontos essenciais desta solução, com os principais detalhes:
 
 ### 1. Reajuste nas Funções de Aptidão
 - ✨ Adição de pesos considerando a prioridade da OS
@@ -135,6 +145,8 @@ Avalia a qualidade das soluções considerando múltiplos critérios.
    - Conversão para DataFrame
 
 ## Informações gerais sobre o resultado do algoritmo
+
+
 
 A análise dos resultados do algoritmo genético para alocação de ordens de serviço de manutenção revela aspectos importantes sobre sua performance e limitações. O algoritmo foi desenvolvido para otimizar a distribuição de 100 ordens de serviço entre 15 operadores ao longo de 5 dias, considerando múltiplas variáveis como habilidades técnicas, prioridades e prazos.
 
