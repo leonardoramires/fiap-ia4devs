@@ -1,5 +1,4 @@
-import pandas as pd
-import functions as F
+from .common_functions import *
 
 def greedy_allocation(operators, orders, days=5):
     """
@@ -14,25 +13,33 @@ def greedy_allocation(operators, orders, days=5):
         dict: Solução de alocação de ordens a operadores por dia.
     """
     # Ordena as ordens de serviço por prioridade (decrescente) e prazo (crescente)
-    sorted_orders = sorted(orders.items(), key=lambda x: (-F.priority_to_number(x[1]['priority']), x[1]['deadline_days']))
+    sorted_orders = sorted(orders.items(), key=lambda x: (-priority_to_number(x[1]['priority']), x[1]['expected_start_day']))
 
     # Inicializa a solução
-    solution = {day: {op: [] for op in operators.keys()} for day in range(days)}
+    solution = {
+        "orders": {},
+        "fitness": 0
+    }
 
     # Atribui cada ordem ao operador mais adequado disponível
     for order_id, order in sorted_orders:
         assigned = False
-        for day in range(days):
+        for day in range(1, days+1):
             for operator_id, operator in operators.items():
-                if F.meets_minimum_skills(operator["skills"], order["required_skills"]):
+                if meets_minimum_skills(operator["skills"], order["required_skills"]):
                     # Verifica se o operador tem horas disponíveis no dia
-                    total_hours = sum(orders[order_id]["estimated_hours"] for order_id in solution[day][operator_id])
+                    total_hours = sum(
+                        order["estimated_hours"]
+                        for assigned_order_id, order in orders.items()
+                        if assigned_order_id in solution["orders"] and
+                           solution["orders"][assigned_order_id]["operator"] == operator_id and
+                           solution["orders"][assigned_order_id]["day"] == day
+                    )
                     if total_hours + order["estimated_hours"] <= operator["hours_per_day"]:
-                        solution[day][operator_id].append(order_id)
+                        solution["orders"][order_id] = {"day": day, "operator": operator_id, "status": "atendida"}
                         assigned = True
                         break
             if assigned:
                 break
 
     return solution
-
