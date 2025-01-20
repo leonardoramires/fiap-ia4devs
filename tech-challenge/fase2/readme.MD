@@ -42,9 +42,9 @@ Minimizar o número de horas extras trabalhadas pelos operadores.
 Garantir que as ordens de maior prioridade sejam atendidas dentro do prazo.
 
 ## O Projeto
-![Fluxograma Genérico do Algoritmo Genético](assets/fluxograma.jpeg)
+![Fluxograma do Algoritmo Genético](assets/fluxograma.jpeg)
 
-*Figura 1: Fluxograma Genérico do Algoritmo Genético*
+*Figura 1: Fluxograma do Algoritmo Genético*
 
 Este projeto foi desenvolvido utilizando um algoritmo genético para otimizar a alocação de ordens de serviço aos operadores. As seguintes informações relevantes sobre as ordens e operadores são utilizadas para a otimização:
 
