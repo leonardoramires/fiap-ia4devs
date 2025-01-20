@@ -10,7 +10,7 @@ Alunos:
 
 ## Evidências do projeto
 - [Link para o repositório](https://github.com/leonardoramires/fiap-ia4devs)
-- [Link para o vídeo do projeto]()
+- [Link para o vídeo do projeto](https://youtu.be/LQtUcsGbxds)
 
 ## Como rodar o projeto
 
