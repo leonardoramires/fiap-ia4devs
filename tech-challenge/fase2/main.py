@@ -166,7 +166,7 @@ if __name__ == '__main__':
             # Reinicialização da população a cada 'reinitalize_interval' gerações.
             # Esta função aumenta a variabilidade na população, trocando a metade da populaçao com menor fit.
             new_population = sorted(new_population, reverse=True, key=lambda individual: 
-                                algorithms[selected_algorithm].calculate_fitness(individual, operators, orders, params["_DAYS"]))
+                                individual["fitness"])
             if generation % params["_REINITIALIZE_INTERVAL"] == 0:
                 num_to_reinitialize = params["_POPULATION_SIZE"] // 2
                 new_population[-num_to_reinitialize:] = [
