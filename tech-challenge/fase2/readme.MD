@@ -87,7 +87,7 @@ Abaixo estão os pontos essenciais desta solução, com os principais detalhes:
 
 ### 1. Geração da População Inicial 🌱
 A população inicial consiste em um conjunto de soluções (indivíduos) geradas aleatoriamente, onde cada solução representa uma possível alocação de ordens de serviço ao longo do período de 5 dias.
-Também existe uma opção de gerar a população inicial com base em uma solução pré-definida, que é a solução encontrada pelo algoritmo genético da fase 1.
+Também existe uma opção de gerar a população inicial com base em uma solução pré-definida.
 
 #### Processo de Geração:
 - **Inicialização**: Estrutura base `{"orders": {order_id: {"day": None, "operator": None, "status": "não atendida"}}, "fitness": 0}`
