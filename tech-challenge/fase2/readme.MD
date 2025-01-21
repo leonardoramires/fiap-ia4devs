@@ -73,7 +73,7 @@ Abaixo estão os pontos essenciais desta solução, com os principais detalhes:
 - 🏆 Preservação dos N melhores indivíduos (5 melhores por default)
 - 📈 Manutenção de soluções de alta qualidade entre gerações
 
-> **Sobre o elitismo**: Os 5 melhores indivíduos são preservados entre as gerações. Se a solução elitismo for alterada para 7, os 7 melhores indivíduos seriam preservados.
+> **Sobre o elitismo**: Os 5 melhores indivíduos são preservados entre as gerações. Se o elitismo for alterada para 7, os 7 melhores indivíduos seriam preservados.
 
 ### 5. Gestão Populacional
 - 🔄 Reinicialização parcial periódica (metade da população)
@@ -136,7 +136,7 @@ A mutação introduz variações nas soluções que são feitas para manter a di
 
 2. **Reinicialização Periódica**:
    - A cada 10 gerações (valor default)
-   - Novas soluções são geradas aleatoriamente
+   - Novas soluções são geradas aleatoriamente para metade da população com o menor fitness.
    - Fitness é recalculado para novos indivíduos
 
 3. **Validações**:
@@ -173,6 +173,9 @@ Os critérios de avaliação são os seguintes:
    - Distribuição balanceada entre operadores
 
 4. **Otimização Evolutiva e parâmetros configuráveis do algoritmo**:
+   - Número de dias organizados pela execução do algoritmo (configurável via `_DAYS`)
+   - Número de operadores disponíveis (configurável via `_N_OPERATORS`)
+   - Número de ordens de serviço a serem alocadas (configurável via `_N_ORDERS`)
    - População inicial de 50 indivíduos (configurável via `_POPULATION_SIZE`)
    - Execução por 50 gerações (configurável via `_GENERATIONS`)
    - Taxa de mutação de 30% (configurável via `_MUTATION_RATE`)
