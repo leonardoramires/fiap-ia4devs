@@ -1,4 +1,5 @@
-# Tech Challenge - Pós-Tech SOAT - FIAP - Fase 2
+# Tech Challenge - Pós-Tech SOAT - FIAP
+# Fase 2
 
 Alunos:
 
@@ -41,9 +42,9 @@ Minimizar o número de horas extras trabalhadas pelos operadores.
 Garantir que as ordens de maior prioridade sejam atendidas dentro do prazo.
 
 ## O Projeto
-![Fluxograma Genético do Algoritmo Genético](assets/fluxograma.jpeg)
+![Fluxograma do Algoritmo Genético](assets/fluxograma.jpeg)
 
-*Figura 1: Fluxograma Genérico do Algoritmo Genético*
+*Figura 1: Fluxograma do Algoritmo Genético*
 
 Este projeto foi desenvolvido utilizando um algoritmo genético para otimizar a alocação de ordens de serviço aos operadores. As seguintes informações relevantes sobre as ordens e operadores são utilizadas para a otimização:
 
@@ -57,17 +58,22 @@ Abaixo estão os pontos essenciais desta solução, com os principais detalhes:
 - 📊 Penalização proporcional por horas extras
 
 ### 2. Otimização do Crossover
-- 🔄 Garantia de atribuição única para cada ordem
-- 📉 Redução de soluções inviáveis
-- 📈 Melhoria na qualidade das soluções
+- 🔄 Crossover em dois segmentos com ponto de corte aleatório
+- 📊 Validação de compatibilidade de habilidades (mínimo 50%)
+- 🔒 Garantia de atribuição única para cada ordem
+- 🎯 Realocação aleatória de ordens não atribuídas
 
 ### 3. Processo de Mutação Inteligente
-- 🧬 Verificação da qualidade pós-mutação
+- 🧬 Taxa de mutação adaptativa (reduz ao longo das gerações)
+- 🎯 Validação de compatibilidade de habilidades do operador
+- 🔄 Verificação da qualidade pós-mutação
 - ↩️ Reversão automática de mutações prejudiciais
 
 ### 4. Sistema de Elitismo
-- 🏆 Preservação dos melhores indivíduos (5 melhores)
+- 🏆 Preservação dos N melhores indivíduos (5 melhores por default)
 - 📈 Manutenção de soluções de alta qualidade entre gerações
+
+> **Sobre o elitismo**: Os 5 melhores indivíduos são preservados entre as gerações. Se o elitismo for alterada para 7, os 7 melhores indivíduos seriam preservados.
 
 ### 5. Gestão Populacional
 - 🔄 Reinicialização parcial periódica (metade da população)
@@ -84,77 +90,118 @@ A população inicial consiste em um conjunto de soluções (indivíduos) gerada
 Também existe uma opção de gerar a população inicial com base em uma solução pré-definida, que é a solução encontrada pelo algoritmo genético da fase 1.
 
 #### Processo de Geração:
-- **Distribuição Aleatória**: As ordens são distribuídas entre operadores e dias
-- **Validação de Habilidades**: Garantia de compatibilidade entre operador e ordem
-- **Estrutura**: `{dia: {operador_id: [ordem_ids]}}`
+- **Inicialização**: Estrutura base `{"orders": {order_id: {"day": None, "operator": None, "status": "não atendida"}}, "fitness": 0}`
+- **Validação de Habilidades**: Filtra operadores válidos com habilidades mínimas necessárias
+- **Distribuição Aleatória**: Para cada ordem:
+  - Atribui dia aleatório (1 a N dias)
+  - Seleciona operador compatível aleatoriamente
+  - Define status baseado no prazo esperado (stats possíveis: "não atendida", "atendida", "atrasada")
 
 ### 2. Processo de Seleção 🎯
-Utilizamos o método de torneio para selecionar as soluções (pais) que gerarão a próxima geração.
-
-#### Etapas do Torneio:
-1. Seleção aleatória de um grupo de soluções
-2. Avaliação da aptidão de cada solução
-3. Escolha da melhor solução como pai
-4. Repetição até atingir o número necessário de pais
+Utilizamos um processo de seleção adaptativo para selecionar os pais para a próxima geração.
+Esse processo é feito através dos seguintes passos:
 
 ### 3. Processo de Crossover 🔄
-O crossover combina duas soluções (pais) para gerar uma nova solução (filho).
+O Crossover é feito através de dois segmentos, com as seguintes características:
 
-#### Metodologia:
-1. **Seleção do Ponto**: 
-   - Escolha aleatória do ponto de divisão
-   - Exemplo: Em 5 dias, ponto 2 = dias [1-2] + [3-5]
+#### Metodologia do Crossover:
+1. **Inicialização**:
+   - Cria filho vazio: `{"orders": {}, "fitness": 0}`
+   - Garante unicidade das ordens a serem distribuidas (Utilização da estrutura de dados set para garantir a unicidade)
 
-2. **Combinação**:
-   - Primeiro segmento do pai 1
-   - Segundo segmento do pai 2
-   - Garantia de atribuição única para cada ordem
+2. **Seleção do Ponto**:
+   - Escolha aleatória do ponto de divisão na lista de ordens
+   - `crossover_point = random.randint(1, len(orders_parent1) - 1)`
+
+3. **Primeiro Segmento**:
+   - Copia ordens do pai 1 até o ponto de crossover
+   - Adiciona apenas se ordem não foi atribuída anteriormente
+
+4. **Segundo Segmento**:
+   - Copia ordens do pai 2 após o ponto de crossover
+   - Evita duplicação de ordens
+
+5. **Tratamento de Ordens Não Atribuídas**:
+   - Identifica ordens que não foram atribuídas
+   - Atribui aleatoriamente a operadores compatíveis
+   - Define dia e status baseado no prazo esperado (stats possíveis: "não atendida", "atendida", "atrasada")
 
 ### 4. Processo de Mutação 🧬
-A mutação introduz variações nas soluções para manter a diversidade genética.
+A mutação introduz variações nas soluções que são feitas para manter a diversidade genética e evitar a convergência prematura para uma solução subótima. Como foi descrito no fluxograma, a mutação é feita através dos seguintes passos:
 
 #### Procedimento:
-1. **Verificação**: Probabilidade de mutação por dia
-2. **Execução**: 
-   - Seleção de dois operadores no mesmo dia
-   - Troca de ordens entre eles
-3. **Validação**: 
-   - Avaliação pré e pós-mutação
-   - Reversão se não houver melhoria
+1. **Taxa de Mutação Adaptativa**:
+   - Cada solução tem chance de `_MUTATION_RATE` de sofrer mutação
+   - Alterações podem incluir novo dia ou operador para ordens selecionadas
+
+2. **Reinicialização Periódica**:
+   - A cada 10 gerações (valor default)
+   - Novas soluções são geradas aleatoriamente para metade da população com o menor fitness.
+   - Fitness é recalculado para novos indivíduos
+
+3. **Validações**:
+   - Verifica compatibilidade de habilidades do novo operador
+   - Atualiza status (atendida/atrasada) baseado no novo dia
+   - Recalcula o fitness após mutação
+
+4. **Preservação de Elite**:
+- Os 5 melhores indivíduos são preservados (5 é um valor default)
+- Garante que boas soluções não sejam perdidas
+
+5. **Controle de Qualidade**:
+   - Compara fitness antes e depois da mutação
+   - Reverte mudanças se o fitness piorar, para evitar a convergência prematura para uma solução subótima
 
 ### 5. Função de Aptidão ⚖️
-Avalia a qualidade das soluções considerando múltiplos critérios.
+A função Fitness avalia a qualidade das soluções considerando múltiplos critérios.
+Os critérios de avaliação são os seguintes:
 
 #### Critérios de Avaliação:
 1. **Compatibilidade de Habilidades**:
-   - Pontuação positiva para matches
+   - Verificação se operador possui as habilidades necessárias para a ordem
+   - Pontuação positiva para matches completos
    - Penalidades para incompatibilidades
 
-2. **Gestão de Prazos**:
-   - Verificação de conclusão no prazo
-   - Penalidades proporcionais a atrasos e prioridades
+2. **Gestão de Prazos e Status**:
+   - Verificação do início esperado vs. dia alocado
+   - Status atualizado como "atendida" ou "atrasada" baseado no prazo
+   - Priorização de ordens urgentes e alta prioridade
 
-3. **Controle de Horas**:
-   - Monitoramento de horas por operador
-   - Penalização por excesso
+3. **Controle de Capacidade**:
+   - Monitoramento de horas por operador por dia
+   - Respeito às horas disponíveis por turno (evitar horas extras)
+   - Distribuição balanceada entre operadores
 
-### 6. Fluxo do Algoritmo 🔄
-1. **Inicialização**:
-   - Geração da população inicial
+4. **Otimização Evolutiva e parâmetros configuráveis do algoritmo**:
+   - Número de dias organizados pela execução do algoritmo (configurável via `_DAYS`)
+   - Número de operadores disponíveis (configurável via `_N_OPERATORS`)
+   - Número de ordens de serviço a serem alocadas (configurável via `_N_ORDERS`)
+   - População inicial de 50 indivíduos (configurável via `_POPULATION_SIZE`)
+   - Execução por 50 gerações (configurável via `_GENERATIONS`)
+   - Taxa de mutação de 30% (configurável via `_MUTATION_RATE`)
+   - Elitismo preservando os 5 melhores indivíduos (configurável via `_ELITISM_SIZE`)
+   - Reinicialização de 50% da população a cada 10 gerações (configurável via `_REINITIALIZE_INTERVAL`)
 
-2. **Ciclo Evolutivo**:
-   - Cálculo de aptidão
-   - Seleção por torneio
-   - Crossover
-   - Mutação
-   - Elitismo
-   - Reinicialização parcial periódica
-
-3. **Finalização**:
+5. **Finalização dos algoritmos**:
    - Seleção da melhor solução
-   - Conversão para DataFrame
+   - Cálculo das métricas finais:
+     - Total de ordens alocadas e não alocadas
+     - Distribuição por prioridade
+     - Distribuição por dia
+     - Horas extras por operador
+   - Geração de relatórios comparativos (incluindo valor de fitness):
+     - Algoritmo Genético
+     - Alocação Humana
+     - Algoritmo Guloso
+     - Programação Linear
+   - Conversão para DataFrame com detalhes de:
+     - Alocação ordem-operador
+     - Compatibilidade de habilidades
+     - Status de atendimento
+     - Controle de horas extras
+   - Visualização interativa com PyGame do calendário de alocações
 
-### 7. Relatório com PyGame 🎮
+### 6. Relatório com PyGame 🎮
 ![Relatório com PyGame](assets/relatorio.gif)
 
 *Figura 2: Relatório com PyGame*
