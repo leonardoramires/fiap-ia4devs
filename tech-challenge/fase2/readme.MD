@@ -73,7 +73,7 @@ Abaixo estão os pontos essenciais desta solução, com os principais detalhes:
 - 🏆 Preservação dos N melhores indivíduos (5 melhores por default)
 - 📈 Manutenção de soluções de alta qualidade entre gerações
 
-> **Sobre o elitismo**: Os 5 melhores indivíduos são preservados entre as gerações como uma forma de demonstrar os 5 dias da semana. Se a solução for alterada para 7 dias, os 7 melhores indivíduos seriam preservados.
+> **Sobre o elitismo**: Os 5 melhores indivíduos são preservados entre as gerações. Se a solução elitismo for alterada para 7, os 7 melhores indivíduos seriam preservados.
 
 ### 5. Gestão Populacional
 - 🔄 Reinicialização parcial periódica (metade da população)
@@ -107,7 +107,7 @@ O Crossover é feito através de dois segmentos, com as seguintes característic
 #### Metodologia do Crossover:
 1. **Inicialização**:
    - Cria filho vazio: `{"orders": {}, "fitness": 0}`
-   - Mantém conjunto de ordens já atribuídas
+   - Garante unicidade das ordens a serem distribuidas (Utilização da estrutura de dados set para garantir a unicidade)
 
 2. **Seleção do Ponto**:
    - Escolha aleatória do ponto de divisão na lista de ordens
@@ -115,12 +115,10 @@ O Crossover é feito através de dois segmentos, com as seguintes característic
 
 3. **Primeiro Segmento**:
    - Copia ordens do pai 1 até o ponto de crossover
-   - Verifica compatibilidade de habilidades do operador
    - Adiciona apenas se ordem não foi atribuída anteriormente
 
 4. **Segundo Segmento**:
    - Copia ordens do pai 2 após o ponto de crossover
-   - Mantém mesmas verificações de compatibilidade
    - Evita duplicação de ordens
 
 5. **Tratamento de Ordens Não Atribuídas**:
@@ -133,21 +131,24 @@ A mutação introduz variações nas soluções que são feitas para manter a di
 
 #### Procedimento:
 1. **Taxa de Mutação Adaptativa**:
-   - Reduz ao longo das gerações: `mutation_rate = mutation_rate - (generation / generations) * 0.05`
-   - Taxa mínima mantida em 0.05 para evitar a convergência prematura
+   - Cada solução tem chance de `_MUTATION_RATE` de sofrer mutação
+   - Alterações podem incluir novo dia ou operador para ordens selecionadas
 
-2. **Processo por Ordem**:
-   - Para cada ordem, aplica mutação com probabilidade `mutation_rate`
-   - Se selecionada, a ordem recebe:
-     - Novo dia aleatório (1 a max_days)
-     - Novo operador aleatório
+2. **Reinicialização Periódica**:
+   - A cada 10 gerações (valor default)
+   - Novas soluções são geradas aleatoriamente
+   - Fitness é recalculado para novos indivíduos
 
 3. **Validações**:
    - Verifica compatibilidade de habilidades do novo operador
    - Atualiza status (atendida/atrasada) baseado no novo dia
-   - Calcula novo fitness após mutação
+   - Recalcula o fitness após mutação
 
-4. **Controle de Qualidade**:
+4. **Preservação de Elite**:
+- Os 5 melhores indivíduos são preservados (5 é um valor default)
+- Garante que boas soluções não sejam perdidas
+
+5. **Controle de Qualidade**:
    - Compara fitness antes e depois da mutação
    - Reverte mudanças se o fitness piorar, para evitar a convergência prematura para uma solução subótima
 
@@ -157,24 +158,26 @@ Os critérios de avaliação são os seguintes:
 
 #### Critérios de Avaliação:
 1. **Compatibilidade de Habilidades**:
-   - Verificação se operador possui no mínimo 50% das habilidades necessárias (`meets_minimum_skills`)
+   - Verificação se operador possui as habilidades necessárias para a ordem
    - Pontuação positiva para matches completos
    - Penalidades para incompatibilidades
 
 2. **Gestão de Prazos e Status**:
    - Verificação do início esperado vs. dia alocado
    - Status atualizado como "atendida" ou "atrasada" baseado no prazo
-   - Priorização de ordens urgentes e alta prioridade nas primeiras alocações
+   - Priorização de ordens urgentes e alta prioridade
 
 3. **Controle de Capacidade**:
    - Monitoramento de horas por operador por dia
    - Respeito às horas disponíveis por turno (evitar horas extras)
-   - Distribuição balanceada entre os operadores
+   - Distribuição balanceada entre operadores
 
-4. **Otimização Evolutiva**:
-   - Taxa de mutação adaptativa (reduz ao longo das gerações, mínimo 0.05)
-   - Elitismo preservando as N melhores soluções (5 melhores por default)
-   - Reinicialização parcial da população a cada 10 gerações
+4. **Otimização Evolutiva e parâmetros configuráveis do algoritmo**:
+   - População inicial de 50 indivíduos (configurável via `_POPULATION_SIZE`)
+   - Execução por 50 gerações (configurável via `_GENERATIONS`)
+   - Taxa de mutação de 30% (configurável via `_MUTATION_RATE`)
+   - Elitismo preservando os 5 melhores indivíduos (configurável via `_ELITISM_SIZE`)
+   - Reinicialização de 50% da população a cada 10 gerações (configurável via `_REINITIALIZE_INTERVAL`)
 
 5. **Finalização dos algoritmos**:
    - Seleção da melhor solução
