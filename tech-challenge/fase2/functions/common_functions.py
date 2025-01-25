@@ -3,7 +3,7 @@ import random
 import pandas as pd
 
 # Função para criar os dados de exemplo
-def create_initial_data(n_orders=None, n_operators=None):
+def create_initial_data(n_orders=None, n_operators=None, max_days=5):
     """
     Inicializa dados simulados de operadores e ordens de serviço. Se 'n_operators' for fornecido, gera operadores e ordens automaticamente.
 
@@ -52,7 +52,7 @@ def create_initial_data(n_orders=None, n_operators=None):
                 "required_skills": required_skills,
                 "estimated_hours": random.randint(2, 8),
                 "priority": random.choice(priority_levels),
-                "expected_start_day": random.randint(1, 5),
+                "expected_start_day": random.randint(1, max_days),
                 "status": "não_atendida",
             }
     # Opçao Default.

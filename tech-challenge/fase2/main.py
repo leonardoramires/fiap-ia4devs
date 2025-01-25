@@ -96,7 +96,7 @@ if __name__ == '__main__':
     algorithms_to_perform = algorithm_keys if args.algorithm is None else [args.algorithm]
 
     # Inicializa operadores e ordens iniciais.
-    operators, orders = cf.create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"])
+    operators, orders = cf.create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"], params["_DAYS"])
 
     # Executa os algoritmos de comparação
     run_algorithm_comparison(operators, orders)    
