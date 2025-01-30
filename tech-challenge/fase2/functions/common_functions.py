@@ -3,7 +3,7 @@ import random
 import pandas as pd
 
 # Função para criar os dados de exemplo
-def create_initial_data(n_orders=None, n_operators=None, max_days=5):
+def create_initial_data(n_operators=None, n_orders=None, max_days=5):
     """
     Inicializa dados simulados de operadores e ordens de serviço. Se 'n_operators' for fornecido, gera operadores e ordens automaticamente.
 
@@ -32,7 +32,12 @@ def create_initial_data(n_orders=None, n_operators=None, max_days=5):
             level = random.choice(skills_level)
             shift = random.choice(["manhã", "tarde", "noite"])
             hours_per_day = random.randint(7, 9)
-            operators[op_id] = {"skills": op_skills, "level": level, "shift": shift, "hours_per_day": hours_per_day}
+            operators[op_id] = {
+                "skills": op_skills, 
+                "level": level, 
+                "shift": shift, 
+                "hours_per_day": hours_per_day
+            }
     # Opçao Default
     else:
         # Dados dos operadores predefinidos.
@@ -46,9 +51,10 @@ def create_initial_data(n_orders=None, n_operators=None, max_days=5):
     # Geração dinâmica de ordens de serviço.
     if n_orders:
         service_orders = {}
-        for i in range(n_orders):
+        for i in range(1, n_orders + 1):
             required_skills = random.sample(skills, random.randint(1, 2))
-            service_orders[f"os{i+1}"] = {
+            os_id = f"os{i}"
+            service_orders[os_id] = {
                 "required_skills": required_skills,
                 "estimated_hours": random.randint(2, 8),
                 "priority": random.choice(priority_levels),
@@ -110,7 +116,7 @@ def meets_minimum_skills(operator_skills, required_skills):
     return meets_minimum, match_percentage
 
 # Função para calcular a aptidão de uma solução 
-def calculate_fitness(solution, operators, orders, max_days):
+def calculate_fitness(solution, operators, orders, max_days=5):
     """
     Calcula a pontuação de aptidão de uma solução. A função avalia como uma solução de alocação de ordens a operadores
     é eficaz, levando em consideração a compatibilidade das habilidades, o cumprimento de prazo e o excesso de horas
@@ -173,19 +179,22 @@ def calculate_fitness(solution, operators, orders, max_days):
         # Penaliza atrasos no início esperado.
         if status == "atrasada":  # Verifica se a ordem está atrasada.
             days_late =  max(0, day - order["expected_start_day"])
-            fitness -= 5 * days_late * priority_multiplier
-
+            penalty = 5 * days_late * priority_multiplier
+            fitness -= penalty
+           
         # Aumenta a pontuação com base na compatibilidade de habilidades e prioridade.
         fitness += skill_match_score * priority_multiplier
-
+       
     # Verifica o excesso de horas trabalhadas por operador por dia.
     for operator_id, daily_hours in operator_daily_hours.items():
         for day, hours_worked in daily_hours.items():
             excess_hours = max(0, hours_worked - operators[operator_id]["hours_per_day"])  # Garante que excess_hours não seja negativo.
             if excess_hours > 0:
-                fitness -= 5 * excess_hours  # Penaliza o excesso de horas trabalhadas.
-
+                penalty = 5 * excess_hours
+                fitness -= penalty
+               
     solution["fitness"] = fitness
+    # print(f"Fitness total da solução: {fitness}")
     return fitness  # Retorna a pontuação de aptidão final da solução.
 
 # Função para tranformar a solução encontrada em Dataframe

@@ -1,5 +1,5 @@
 import pulp
-from .common_functions import *
+from common_functions import *
 
 def linear_programming_allocation(operators, orders, days=5):
     """

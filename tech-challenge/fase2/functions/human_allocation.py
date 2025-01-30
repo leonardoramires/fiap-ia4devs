@@ -1,6 +1,6 @@
-from .common_functions import *
+from common_functions import *
 
-def human_allocation(operators, orders, days=5):
+def human_allocation_execution(operators, orders, days=5):
     """
     Realiza a alocação de ordens de serviço separando-as em grupos de prioridade e atribuindo-as aos operadores.
 

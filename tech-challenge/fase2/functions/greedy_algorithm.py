@@ -1,4 +1,4 @@
-from .common_functions import *
+from common_functions import *
 
 def greedy_allocation(operators, orders, days=5):
     """

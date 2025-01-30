@@ -1,9 +1,8 @@
 # Imports das funções dos algoritmos
-from functions import algorithms
-from functions import common_functions as cf
-from functions import greedy_algorithm as ga
-from functions import linear_programming_algorithm as lp
-from functions import human_allocation as ha
+import functions.common_functions as cf
+import functions.greedy_algorithm as ga
+import functions.linear_programming_algorithm as lp
+import functions.human_allocation as ha
 
 # Imports para o funcionamento do PyGame
 import pygame
@@ -41,6 +40,13 @@ params = {
     "_DAYS": 5,  
 }
 
+algorithms = {
+    "genetic_algorithm",
+    "greedy_algorithm",
+    "human_allocation",
+    "linear_programming_algorithm",
+}
+
 def run_greedy_algorithm(operators, orders):
     print("="*35 + " Greedy Algorithm " + "="*35)
     solution = ga.greedy_allocation(operators, orders)
@@ -61,7 +67,7 @@ def run_linear_algorithm(operators, orders):
 
 def run_human_allocation(operators, orders):
     print("="*35 + " Human Allocation " + "="*35)
-    solution = ha.human_allocation(operators, orders)
+    solution = ha.human_allocation_execution(operators, orders)
     human_allocation_fitness = cf.calculate_fitness(solution, operators, orders, params["_DAYS"])
     solution_df, unassigned_orders = cf.solution_to_dataframe(solution, operators, orders)
     print("Fitness (Alocação Humana):", human_allocation_fitness)
@@ -96,7 +102,7 @@ if __name__ == '__main__':
     algorithms_to_perform = algorithm_keys if args.algorithm is None else [args.algorithm]
 
     # Inicializa operadores e ordens iniciais.
-    operators, orders = cf.create_initial_data(params["_N_ORDERS"], params["_N_OPERATORS"], params["_DAYS"])
+    operators, orders = cf.create_initial_data(params["_N_OPERATORS"], params["_N_ORDERS"], params["_DAYS"])
 
     # Executa os algoritmos de comparação
     run_algorithm_comparison(operators, orders)    

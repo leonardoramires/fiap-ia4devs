@@ -1,7 +1,8 @@
 import random
 import pandas as pd
 import copy
-from .common_functions import *
+
+from common_functions import *
 
 # Função para converter nível de habilidade em valor numérico
 def skill_level_to_number(level):
@@ -36,7 +37,7 @@ def create_initial_solution(operators, orders, max_days):
     # Inicializa a solução.
     solution = {
         "orders": {
-            order_id: {"day": None, "operator": None, "status": "não atendida"}
+            order_id: {"day": None, "operator": None, "status": "não_atendida"}
             for order_id in orders.keys()
         },
         "fitness": 0,
@@ -265,7 +266,7 @@ def op_orders_to_dataframe(operators, orders):
 
 # Função para executar o algoritmo genético no proprio arquivo
 def run_genetic_algorithm(operators, orders, population_size=50, generations=100, 
-                          mutation_rate=0.4, elitism_size=5, reinitalize_interval=10, days=5):
+                          mutation_rate=0.4, elitism_size=5, reinitalize_interval=10, max_days=5):
     """
     Executa o algoritmo genético, evoluindo uma população de soluções ao longo de várias gerações.
 
@@ -287,10 +288,10 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
     - O algoritmo utiliza a mutação, elitismo e re-inicialização periódica da população.
     """
     # Inicializa operadores e ordens iniciais.
-    operators, orders = create_initial_data(orders, operators)
+    operators, orders = create_initial_data(operators, orders, max_days)
     
     # Gera populaçao inicial com base nos operadores e ordens iniciais.
-    population = [create_initial_solution(operators, orders, days) 
+    population = [create_initial_solution(operators, orders, max_days) 
                   for _ in range(population_size)]
 
     # Salva os melhores fitness e geraçoes para plottar.
@@ -306,7 +307,7 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
 
         # population = sorted(population, key=calculate_fitness).
         population = sorted(population, reverse=True, key=lambda individual: 
-                            calculate_fitness(individual, operators, orders))
+                            calculate_fitness(individual, operators, orders, max_days))
 
         # Exibição da aptidão da melhor solução da geração.
         best_fitness = calculate_fitness(population[0], operators, orders)
@@ -318,8 +319,8 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
         new_population = [population[0]]    # Preserva o melhor indivíduo (elitismo)
         while len(new_population) < population_size:
             parent1, parent2 = random.choices(population[:elitism_size], k=2)
-            child = crossover(parent1, parent2, operators, orders, days)
-            child = mutate(child, operators, orders, mutation_rate, days)
+            child = crossover(parent1, parent2, operators, orders, max_days)
+            child = mutate(child, operators, orders, mutation_rate, max_days)
             new_population.append(child)
 
         # Reinicialização da população a cada 'reinitalize_interval' gerações.
@@ -327,7 +328,7 @@ def run_genetic_algorithm(operators, orders, population_size=50, generations=100
         if generation % reinitalize_interval == 0:
             num_to_reinitialize = population_size // 2
             new_population[-num_to_reinitialize:] = [
-                create_initial_solution(operators, orders, days) 
+                create_initial_solution(operators, orders, max_days) 
                 for _ in range(num_to_reinitialize)]
 
         population = new_population
