@@ -1,13 +1,14 @@
 from tkinter import *
+from tkinter import filedialog
 import ttkbootstrap as ttk
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.dialogs import Messagebox
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.constants import *
 from pathlib import Path
-from tkinter import TclError
 
 import random
+import pandas as pd
 
 # Funções dos algoritmos
 import common_functions as cf
@@ -132,17 +133,34 @@ class OrganizadorOS(ttk.Frame):
         # )
         # btn.pack(side=LEFT, ipadx=5, ipady=5, padx=0, pady=1)
 
-    # Reseta as informações contidas na janela de criaçao de OS e volta parametros ao padrao.
-    def save_results(self, dataframe):
-        message= "Gostaria de salvar os resultados?"
-        should_save = Messagebox.show_question(message, 
-                                 title="Salvar", 
-                                 buttons=['Sim:primary', 'Não:secondary'],
-                                 parent=self.operators_table_frame,
-                                 alert=True,
-                                 )
-        if should_save == 'Sim':
-            cf.salvar_arquivos(dataframe)
+    # Salva arquivo no computador do usuario por filedialog.
+    def export_to_file(self):
+        # Abre uma janela para o usuário escolher o local e o nome do arquivo
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",  # Extensão padrão do arquivo
+            filetypes=[("Arquivos CSV", "*.csv"), ("Excel files", "*.xlsx"), ("Todos os arquivos", "*.*")],  # Tipos de arquivo permitidos
+            title="Salvar Arquivo"  # Título da janela
+        )
+
+        if not file_path :
+            return  # Usuário cancelou a ação
+
+        # Se o usuário escolher um local (não cancelar a operação)
+        try:
+            if self.solution_dataframe is not None:
+                if file_path.endswith(".csv"):
+                    # Salva o DataFrame no local escolhido
+                    self.solution_dataframe.to_csv(file_path, index=False, sep=",")
+                elif file_path.endswith(".xlsx"):
+                    self.solution_dataframe.to_excel(file_path, index=False)
+                
+                Messagebox.show_info(title="Sucesso", 
+                                        message="Arquivo exportado com sucesso!",
+                                        parent=self.savefile_btn_row)
+        except Exception as e:
+            Messagebox.show_error(title="Erro", 
+                                    message=f"Falha ao exportar: {e}",
+                                    parent=self.savefile_btn_row)
 
     #============= FUNCTIONS ============= 
     # Reseta as informações contidas na janela de criaçao de OS e volta parametros ao padrao.
@@ -151,7 +169,7 @@ class OrganizadorOS(ttk.Frame):
         should_clear = Messagebox.show_question(message, 
                                  title="Reset", 
                                  buttons=['Sim:primary', 'Não:secondary'],
-                                 parent=self.operators_table_frame,
+                                 parent=self.op_btn_row,
                                  alert=True,
                                  )
         if should_clear == 'Sim':
@@ -172,6 +190,7 @@ class OrganizadorOS(ttk.Frame):
             if hasattr(self, table_name) and hasattr(self, data_name):
                 table = getattr(self, table_name)
                 data = getattr(self, data_name)
+                table.reset_table()
                 table.delete_rows()
                 table.load_table_data()
                 data.clear()
@@ -205,11 +224,12 @@ class OrganizadorOS(ttk.Frame):
             stripecolor=(ttk.Style().colors.secondary, None),
         )
 
-        # Centraliza os cabeçalhos
-        for i, col in enumerate(columns):
+       # Configura todas as colunas para centralizar o conteúdo
+        for i in range(len(table.tablecolumns)):
             table.tablecolumns[i].configure(stretch=True, anchor="center")
-            table.autofit_columns()
             table.align_heading_center(None, i)
+        
+        table.autofit_columns()
 
         table.pack(fill=BOTH, expand=YES)
         return table
@@ -228,8 +248,6 @@ class OrganizadorOS(ttk.Frame):
         # result_data_dia = []
         # result_data_operator = []
         result_data_os = []
-
-        
         operator_daily_hours = {}
 
         # Processa a best_solution para preencher as tabelas
@@ -240,27 +258,39 @@ class OrganizadorOS(ttk.Frame):
 
             # Dados do operador (se disponível)
             operator_info = self.operators.get(operator_id, {})
-            skills = operator_info.get("skills", "N/A")
+            op_skills = operator_info.get("skills", "")
             level = operator_info.get("level", "N/A")
             shift = operator_info.get("shift", "N/A")           # ---> Não utilizado.
-            hours_per_day = operator_info.get("hours_per_day", "N/A")
+            hours_per_day = operator_info.get("hours_per_day", 0)
 
             # Dados da ordem
             order_info = self.orders.get(order_id, {})
-            required_skills = order_info.get("required_skills", "N/A")
-            estimated_hours = order_info.get("estimated_hours", "N/A")
+            required_skills = order_info.get("required_skills", "")
+            estimated_hours = order_info.get("estimated_hours", 0)
             priority = order_info.get("priority", "N/A")
-            expected_start_day = order_info.get("expected_start_day", "N/A")
+            expected_start_day = order_info.get("expected_start_day", 0)
 
             # Infos adicionais
             late_work = max(0, day - expected_start_day)  # Atraso
-            required_skills_set = set(required_skills)
-            operator_skills_set = set(skills)
+
+            # Ordem correta das habilidades
+            skills_order = ["pintura", "elétrica", "alvenaria", "hidráulica", "solda"]
+            ordered_required_skills = [skill for skill in skills_order if skill in required_skills]
+            ordered_op_skills = [skill for skill in skills_order if skill in op_skills]
+
+            # Converte as listas de habilidades em conjuntos
+            required_skills_set = set(ordered_required_skills)
+            operator_skills_set = set(ordered_op_skills)
+
+            # Calcula as habilidades correspondentes e faltantes
             matched_skills = required_skills_set & operator_skills_set
             missing_skills = required_skills_set - operator_skills_set
 
-            skill_compatibility = len(matched_skills) / len(required_skills) if required_skills else 1.0
+            # Calcula compatibilidade de habilidades
+            skill_compatibility = len(matched_skills) / len(required_skills_set) if required_skills_set else 1.0
             skill_match = round(skill_compatibility * 100, 2)
+
+            # Mapeia a compatibilidade de nível de prioridade
             priority_level_map = {
                 "alta": ["especialista", "sênior"],
                 "urgente": ["especialista", "sênior"],
@@ -287,30 +317,53 @@ class OrganizadorOS(ttk.Frame):
             # Adiciona dados à tabela de resultados por operador
             # result_data_operator.append([operator_id, skills, level, shift, hours_per_day])
 
-            # Adiciona dados à tabela de listagem geral das OS
-            row = [day, order_id, operator_id, required_skills, skills, level, 
+            # Formata missing_skills como uma string legível
+            missing_skills_str = ", ".join(missing_skills) if missing_skills else "N/A"
+            required_skills_str = ", ".join(required_skills) if required_skills else "N/A"
+            op_skills_str = ", ".join(op_skills) if required_skills else "N/A"
+
+            # Formata skill_match como uma string com o símbolo de porcentagem
+            skill_match_str = f"{skill_match}%"
+            
+            # Adiciona dados à tabela de listagem geral das OS.
+            row = [day, order_id, operator_id, required_skills_str, op_skills_str, level, 
                     estimated_hours, hours_per_day, priority, expected_start_day, late_work, 
-                    skill_match, missing_skills, compatibility_level, extra_hours, total_extra_hours, status]
+                    skill_match_str, missing_skills_str, compatibility_level, extra_hours, total_extra_hours, status]
+           
+            # Converte todos os valores da linha para string.
+            # row = [str(value) if value is not None else "" for value in row]
+
+            # Insere a linha na tabela.
             result_data_os.append(row)
-
             self.result_table_os.insert_row("end", values=row)
-
-            # Centraliza os cabeçalhos
-            for i, col in enumerate(row):
-                self.result_table_os.tablecolumns[i].configure(stretch=True, anchor="center")
-                self.result_table_os.autofit_columns()
-                self.result_table_os.align_heading_center(None, i)
 
         # Atualiza as tabelas com os novos dados
         # self.result_data_dia = result_data_dia  # Substitui os dados antigos
         # self.result_data_operator = result_data_operator  # Substitui os dados antigos
         self.result_data_os = result_data_os  # Substitui os dados antigos
-       
         
         # Atualiza as tabelas na interface
         # self.result_table_dia.load_table_data()
         # self.result_table_operator.load_table_data()
+
+        # Centraliza os cabeçalhos e ajusta as colunas.
+        # Configura todas as colunas para centralizar o conteúdo
+        
+        for i in range(len(self.result_table_os.tablecolumns)):
+            self.result_table_os.tablecolumns[i].configure(stretch=True, anchor="center")
+            self.result_table_os.align_heading_center(None, i)
+        
+        # Ajusta as colunas ao tamanho do conteúdo.
+        self.result_table_os.autofit_columns()
+       
+        # Atualiza a tabela na interface.
         self.result_table_os.load_table_data()
+
+        # Transforma a solução em DataFrame e disponibiliza pra salvamento.
+        self.solution_dataframe, self.unassigned_orders = cf.solution_to_dataframe(best_solution, self.operators, self.orders)
+
+        # Atualiza botao de salvamento.
+        self.update_save_button_state()
     
     # Update nos valores dos scales.
     def update_scale_value(self, value, scale_var):
@@ -360,8 +413,12 @@ class OrganizadorOS(ttk.Frame):
 
 
         # Caso especial.
-        min_scale_value = 2 if param_name == "_POPULATION_SIZE" else 1
-        value_normalized = int(self.params[param_name] * 100) if param_name == "_MUTATION_RATE" else self.params[param_name]
+        min_scale_value = 2 if param_name == "_POPULATION_SIZE" or param_name == "_N_ORDERS" else 1
+
+        if param_name == "_MUTATION_RATE":
+            value_normalized = int(self.params[param_name] * 100)
+        else:
+            value_normalized = self.params[param_name]
        
         # Variável do Scale.
         scale_var = ttk.IntVar(value=value_normalized)
@@ -530,6 +587,7 @@ class OrganizadorOS(ttk.Frame):
                     table.delete_rows()
                     table.load_table_data()
                     data.clear()
+                    update_save_button_state()
 
         # Atribui a função de forma global.
         self.clear_results = clear_results
@@ -551,16 +609,37 @@ class OrganizadorOS(ttk.Frame):
         # self.result_table_operator = self.create_table(tab_operator, columns_results_operator, self.result_data_operator, "Resultados")
         
         # Aba: Listagem geral das OS -------------------------
-        tab_os = ttk.Frame(right_panel, padding=5)
-        right_panel.add(tab_os, text="Listagem Os")
+        results_tab_os = ttk.Frame(right_panel, padding=5)
+        right_panel.add(results_tab_os, text="Listagem Os")
+
+        self.savefile_btn_row = ttk.Frame(results_tab_os)
+        self.savefile_btn_row.pack( fill=X, pady=5)
+        
+        def update_save_button_state():
+            if self.result_table_os.tablerows:  # Se houver dados na tabela
+                self.save_button.config(state=NORMAL)
+            else:
+                self.save_button.config(state=DISABLED)
+        
+        self.update_save_button_state = update_save_button_state
+
+        _func = lambda: self.export_to_file()
+        self.save_button = ttk.Button(
+                    self.savefile_btn_row, 
+                    text="Salvar Resultado", 
+                    command=_func,
+                    state=DISABLED,
+        )
+        self.save_button.pack(side=LEFT, padx=10, pady=10)
+        
 
         columns_results_os=["dia", "id_os", "id_op", "Serviços", "skills_operador", "nivel_operador", "horas_estimadas",
                             "horas_disponiveis", "prioridade", "inicio_esperado", "atraso", "compatibilidade_os_op", 
                             "habilidades_nao_atendidas", "compatibilidade_prioridade", "hora_extra", "total_hora_extra", "status"]
         self.result_data_os=[]
 
-        self.result_table_os = self.create_table(tab_os, columns_results_os, self.result_data_os, "Resultados")
-        
+        self.result_table_os = self.create_table(results_tab_os, columns_results_os, self.result_data_os, "Resultados")
+   
     # Painel de criação de nova OS pelo usuário.
     def create_new(self, tab):
         """
@@ -676,12 +755,12 @@ class OrganizadorOS(ttk.Frame):
         # Função para adicionar operador manualmente
         def add_operator():
             n_operators = self.get_scale_value("_N_OPERATORS")
-            selected_skills = ", ".join([skill for skill, var in operator_inputs["skills_op_vars"].items() if var.get()])
+            selected_skills = [skill for skill, var in operator_inputs["skills_op_vars"].items() if var.get()]
             for i in range(1, n_operators+1):
                 op_id = f"op{i}"
                 if op_id not in self.operators:
                     self.operators[op_id] = {
-                        "skills": selected_skills,
+                        "skills": list(selected_skills),
                         "level": operator_inputs["level_op_var"].get(),
                         "shift": operator_inputs["shift_op_var"].get(),
                         "hours_per_day": operator_inputs["hours_op_var"].get(),
@@ -698,7 +777,7 @@ class OrganizadorOS(ttk.Frame):
                 op_id = f"op{i}"
                 if op_id not in self.operators:
                     self.operators[op_id] = {
-                        "skills": ", ".join(random.sample(skills_op, random.randint(1, 2))),
+                        "skills": random.sample(skills_op, random.randint(1, 2)),
                         "level": random.choice(levels_op),
                         "shift": random.choice(shifts_op),
                         "hours_per_day": random.randint(7, 9),
@@ -708,9 +787,9 @@ class OrganizadorOS(ttk.Frame):
         self.generate_operators = generate_operators
         
         # Linha horizontal para todos os botoes de ação.
-        op_btn_row = ttk.Frame(operators_tab)
-        op_btn_row.pack( fill=X, pady=5)
-        ttk.Button(op_btn_row, text="Gerar Operadores Aleatórios", command=generate_operators).pack(side=LEFT, padx=10, pady=10)
+        self.op_btn_row = ttk.Frame(operators_tab)
+        self.op_btn_row.pack( fill=X, pady=5)
+        ttk.Button(self.op_btn_row, text="Gerar Operadores Aleatórios", command=generate_operators).pack(side=LEFT, padx=10, pady=10)
         
         # Tabela para exibir operadores
         self.operator_table = self.create_table(
@@ -827,12 +906,12 @@ class OrganizadorOS(ttk.Frame):
         # Botão para adicionar ordem manualmente
         def add_order():
             n_orders = self.get_scale_value("_N_ORDERS")
-            selected_skills = ", ".join([skill for skill, var in order_inputs["skills_os_vars"].items() if var.get()])
+            selected_skills = [skill for skill, var in order_inputs["skills_os_vars"].items() if var.get()]
             for i in range(1, n_orders + 1):
                 os_id = f"os{i}"
                 if os_id not in self.orders:
                     self.orders[os_id] = {
-                        "required_skills": selected_skills,
+                        "required_skills": list(selected_skills),
                         "estimated_hours": order_inputs["estimated_hours_os_var"].get(),
                         "priority": order_inputs["priority_levels_os_var"].get(),
                         "expected_start_day": order_inputs["expected_start_day_os_var"].get(),
@@ -850,7 +929,7 @@ class OrganizadorOS(ttk.Frame):
                 os_id = f"os{i}"
                 if os_id not in self.orders:
                     self.orders[os_id] = {
-                        "required_skills": ", ".join(random.sample(required_skills_os, random.randint(1, 2))),
+                        "required_skills": random.sample(required_skills_os, random.randint(1, 2)),
                         "estimated_hours": random.randint(1, 8),
                         "priority": random.choice(priority_levels_os),
                         "expected_start_day": random.randint(1, max_service_days),
@@ -941,7 +1020,6 @@ class OrganizadorOS(ttk.Frame):
         
         # Inicializa operadores e ordens.
         operators, orders = self.create_initial_data()
-        
         
         # Gera populaçao inicial com base nos operadores e ordens iniciais.
         population = [ga.create_initial_solution(operators, orders, self.max_days) 

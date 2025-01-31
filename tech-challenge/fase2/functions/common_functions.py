@@ -27,7 +27,7 @@ def create_initial_data(n_operators=None, n_orders=None, max_days=5):
         operators = {}
         for i in range(1, n_operators + 1):
             op_id = f"op{i}"
-            num_skills = random.randint(2, 3)
+            num_skills = random.randint(1, 2)
             op_skills = random.sample(skills, num_skills)
             level = random.choice(skills_level)
             shift = random.choice(["manhã", "tarde", "noite"])
@@ -105,7 +105,7 @@ def meets_minimum_skills(operator_skills, required_skills):
         meets_minimum (bool): True se o operador atender pelo menos 50% das habilidades, False caso contrário.
         match_percentage(float): a porcentagem de habilidades atendidas.
     """
-    matching_skills = set(operator_skills).intersection(required_skills)
+    matching_skills = set(operator_skills) & set(required_skills)
     
     # Verifica se a porcentagem de habilidades está acima da metade (valor minimo).
     match_percentage = len(matching_skills) / len(required_skills) if required_skills else 1
@@ -152,8 +152,8 @@ def calculate_fitness(solution, operators, orders, max_days=5):
     
     # Itera sobre cada ordem na solução.
     for order_id, allocation in solution["orders"].items():
-        operator_id = allocation["operator"]
         day = allocation["day"]
+        operator_id = allocation["operator"]
         status = allocation["status"]
 
         # Obtém os dados da ordem e do operador.
@@ -194,7 +194,6 @@ def calculate_fitness(solution, operators, orders, max_days=5):
                 fitness -= penalty
                
     solution["fitness"] = fitness
-    # print(f"Fitness total da solução: {fitness}")
     return fitness  # Retorna a pontuação de aptidão final da solução.
 
 # Função para tranformar a solução encontrada em Dataframe

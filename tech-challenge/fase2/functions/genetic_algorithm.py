@@ -47,7 +47,7 @@ def create_initial_solution(operators, orders, max_days):
         # Identifica operadores válidos para a ordem com base nas habilidades.
         valid_operators = [
             op_id for op_id, operator in operators.items()
-            if meets_minimum_skills(operator["skills"], order_data["required_skills"])
+            if meets_minimum_skills(operator["skills"], order_data["required_skills"])[0]
         ]
 
         if valid_operators:  # Apenas atribui se houver operadores válidos.
@@ -105,7 +105,7 @@ def crossover(parent1, parent2, operators, orders, max_days):
 
             # Verifica se o operador é compatível e a ordem não foi atribuída.
             if (order_id not in assigned_orders
-                and meets_minimum_skills(operators[operator]["skills"], orders[order_id]["required_skills"])
+                and meets_minimum_skills(operators[operator]["skills"], orders[order_id]["required_skills"])[0]
                 ):
                 child["orders"][order_id] = {"operator": operator, "day": day, "status": status}
                 assigned_orders.add(order_id)
@@ -120,7 +120,7 @@ def crossover(parent1, parent2, operators, orders, max_days):
 
             # Verifica se o operador é compatível e a ordem não foi atribuída.
             if (order_id not in assigned_orders
-                and meets_minimum_skills(operators[operator]["skills"], orders[order_id]["required_skills"])
+                and meets_minimum_skills(operators[operator]["skills"], orders[order_id]["required_skills"])[0]
             ):
                 child["orders"][order_id] = {"operator": operator, "day": day, "status": status}
                 assigned_orders.add(order_id)
@@ -136,10 +136,10 @@ def crossover(parent1, parent2, operators, orders, max_days):
             new_status = "atrasada" if late_order > 0 else "atendida"
 
             # Garante que o operador é compatível.
-            while not meets_minimum_skills(operators[random_operator]["skills"], orders[order_id]["required_skills"]):
+            while not meets_minimum_skills(operators[random_operator]["skills"], orders[order_id]["required_skills"])[0]:
                 random_operator = random.choice(list(operators.keys()))
 
-            child["orders"][order_id] = {"operator": random_operator, "day": random_day, "status": new_status}
+            child["orders"][order_id] = {"day": random_day, "operator": random_operator, "status": new_status}
             assigned_orders.add(order_id)
 
     # Recalcula o fitness para o novo individuo sendo criado.
@@ -188,7 +188,7 @@ def mutate(solution, operators, orders, mutation_rate, max_days):
             new_operator = random.choice(list(operators.keys()))
 
             # Verifica se o novo operador atende às habilidades necessárias para a ordem.
-            if meets_minimum_skills(operators[new_operator]["skills"], orders[order_id]["required_skills"]):
+            if meets_minimum_skills(operators[new_operator]["skills"], orders[order_id]["required_skills"])[0]:
                 # Atualiza temporariamente a alocação para o novo operador e dia.
                 mutated["orders"][order_id] = {"day": new_day, "operator": new_operator, "status": None}
 
