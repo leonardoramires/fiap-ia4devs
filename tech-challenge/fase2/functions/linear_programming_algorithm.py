@@ -3,7 +3,7 @@ from common_functions import *
 
 def linear_programming_allocation(operators, orders, days=5):
     """
-    Realiza a alocação de ordens de serviço usando Programação Linear.
+    Realiza a alocação de ordens de serviço usando Programacao Linear.
 
     Args:
         operators (dict): Dicionário de operadores, contendo suas habilidades e horários.

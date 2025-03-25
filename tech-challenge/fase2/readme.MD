@@ -193,7 +193,7 @@ Os critérios de avaliação são os seguintes:
      - Algoritmo Genético
      - Alocação Humana
      - Algoritmo Guloso
-     - Programação Linear
+     - Programacao Linear
    - Conversão para DataFrame com detalhes de:
      - Alocação ordem-operador
      - Compatibilidade de habilidades
@@ -212,7 +212,7 @@ Este relatório foi gerado utilizando a biblioteca PyGame, que é uma biblioteca
 A análise dos resultados do algoritmo genético para alocação de ordens de serviço de manutenção revela aspectos importantes sobre sua performance e limitações. O algoritmo foi desenvolvido para otimizar a distribuição de 100 ordens de serviço entre 15 operadores ao longo de 5 dias, considerando múltiplas variáveis como habilidades técnicas, prioridades e prazos.
 
 ### 1. 🔄 Comparação com outros algoritmos
-Outros algoritmos foram utilizados por ordem de realizar a comparação, como o algoritmo guloso, o algoritmo de programação linear e a alocação humana.
+Outros algoritmos foram utilizados por ordem de realizar a comparação, como o algoritmo guloso, o algoritmo de Programacao linear e a alocação humana.
 Esta comparação foi realizada com base no fitness das soluções encontradas pelos algoritmos, que é uma medida da qualidade da solução encontrada. O resultado desta comparação pode ser visto na seção 📊 Estatísticas gerais do algoritmo.
 
 ### 2. 📊 Estatísticas gerais do algoritmo
